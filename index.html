@@ -1,0 +1,1145 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex">
+<style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+</head>
+<body>
+<title>Mi cartera indexada</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,650&family=Figtree:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: cabecera con origen de datos -> barra de filtros fija -> cifras clave -> rejilla de gráficas -> tablas de detalle */
+:root {
+  --bg: #f3f4f6; --surface: #fcfcfb; --surface-2: #eceef1; --ink: #121417; --ink-2: #4b5059; --muted: #7d828b;
+  --grid: #e3e5e9; --axis: #c3c7ce; --border: rgba(18,20,23,.10); --focus: #2a78d6;
+  --s1: #2a78d6; --s2: #eb6834; --s3: #1baf7a; --s4: #eda100; --s5: #e87ba4;
+  --pos: #2a78d6; --neg: #e34948; --mid: #f0efec; --good-ink: #006300; --bad-ink: #b42828;
+  --warn-bg: #fff4d6; --warn-ink: #6b4a00; --est: rgba(237,161,0,.10);
+  --f-display: "Bricolage Grotesque", "Figtree", system-ui, sans-serif;
+  --f-body: "Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --r: 10px;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0d0d0d; --surface: #1a1a19; --surface-2: #242423; --ink: #ffffff; --ink-2: #c3c2b7; --muted: #8f8d86;
+  --grid: #2c2c2a; --axis: #45453f; --border: rgba(255,255,255,.10); --focus: #3987e5;
+  --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500; --s5: #d55181;
+  --pos: #3987e5; --neg: #e66767; --mid: #383835; --good-ink: #0ca30c; --bad-ink: #ff8a8a;
+  --warn-bg: #3a2e0c; --warn-ink: #ffd877; --est: rgba(201,133,0,.14); color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --bg: #0d0d0d; --surface: #1a1a19; --surface-2: #242423; --ink: #ffffff; --ink-2: #c3c2b7; --muted: #8f8d86;
+  --grid: #2c2c2a; --axis: #45453f; --border: rgba(255,255,255,.10); --focus: #3987e5;
+  --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500; --s5: #d55181;
+  --pos: #3987e5; --neg: #e66767; --mid: #383835; --good-ink: #0ca30c; --bad-ink: #ff8a8a;
+  --warn-bg: #3a2e0c; --warn-ink: #ffd877; --est: rgba(201,133,0,.14); color-scheme: dark; }
+
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--ink); font: 15px/1.5 var(--f-body); }
+.wrap { max-width: 1320px; margin: 0 auto; padding-inline: 20px; padding-block: 20px 56px; display: grid; gap: 18px; }
+h1, h2, h3 { font-family: var(--f-display); margin: 0; text-wrap: balance; letter-spacing: -.01em; }
+h1 { font-size: clamp(1.6rem, 1.2rem + 1.4vw, 2.2rem); font-weight: 650; }
+h2 { font-size: 1.05rem; font-weight: 650; }
+.num { font-variant-numeric: tabular-nums; }
+button, select, input { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+
+/* cabecera */
+.head { display: flex; flex-wrap: wrap; gap: 14px 24px; align-items: end; justify-content: space-between; }
+.head p { margin: 4px 0 0; color: var(--ink-2); font-size: .9rem; }
+.src { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.chip { display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; border-radius: 999px; background: var(--surface-2); color: var(--ink-2); font-size: .8rem; white-space: nowrap; }
+.chip.est { background: var(--warn-bg); color: var(--warn-ink); }
+.actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.btn { border: 1px solid var(--border); background: var(--surface); border-radius: 8px; padding: 8px 14px; cursor: pointer; font-weight: 600; font-size: .88rem; }
+.btn:hover { background: var(--surface-2); }
+.btn.primary { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+.btn.primary:hover { opacity: .88; }
+.btn.small { padding: 4px 10px; font-size: .8rem; font-weight: 500; }
+.notice { border-radius: var(--r); padding: 10px 14px; background: var(--warn-bg); color: var(--warn-ink); font-size: .88rem; display: flex; gap: 10px; align-items: start; }
+.notice.ok { background: var(--surface-2); color: var(--ink-2); }
+.notice b { font-weight: 700; }
+
+/* filtros */
+.filters { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 5; background: color-mix(in srgb, var(--bg) 92%, transparent); backdrop-filter: blur(8px);
+  display: flex; flex-wrap: wrap; gap: 10px 18px; align-items: center; padding-block: 10px; border-bottom: 1px solid var(--border); }
+.fgroup { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.flabel { font-size: .72rem; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); font-weight: 600; margin-right: 2px; }
+.seg { display: inline-flex; background: var(--surface-2); border-radius: 8px; padding: 2px; flex-wrap: wrap; }
+.seg button { border: 0; background: none; padding: 5px 10px; border-radius: 6px; cursor: pointer; font-size: .84rem; color: var(--ink-2); }
+.seg button[aria-pressed="true"] { background: var(--surface); color: var(--ink); font-weight: 600; box-shadow: 0 1px 2px rgba(0,0,0,.08); }
+.fgroup input[type="date"], .fgroup select { border: 1px solid var(--border); background: var(--surface); border-radius: 7px; padding: 4px 8px; font-size: .84rem; }
+.bchip { display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--border); background: var(--surface); border-radius: 999px; padding: 4px 10px 4px 8px; cursor: pointer; font-size: .82rem; }
+.bchip .dot { width: 10px; height: 10px; border-radius: 3px; background: var(--c); }
+.bchip[aria-pressed="false"] { opacity: .45; }
+.bchip[aria-pressed="false"] .dot { background: transparent; box-shadow: inset 0 0 0 1.5px var(--c); }
+
+/* cifras clave */
+.kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 12px; }
+.kpi { background: var(--surface); border-radius: var(--r); padding: 14px 16px; display: grid; gap: 2px; align-content: start; }
+.kpi .k { font-size: .76rem; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; font-weight: 600; }
+.kpi .v { font-family: var(--f-display); font-size: 1.55rem; font-weight: 650; letter-spacing: -.01em; }
+.kpi .s { font-size: .8rem; color: var(--ink-2); }
+.pos-t { color: var(--good-ink); } .neg-t { color: var(--bad-ink); }
+.kpi.hero { background: var(--ink); color: var(--bg); }
+.kpi.hero .k, .kpi.hero .s { color: color-mix(in srgb, var(--bg) 70%, var(--ink)); }
+
+/* tarjetas y rejilla */
+.grid { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 16px; }
+.card { background: var(--surface); border-radius: var(--r); padding: 16px 16px 10px; display: grid; gap: 8px; min-width: 0; align-content: start; }
+.c12 { grid-column: span 12; } .c7 { grid-column: span 7; } .c5 { grid-column: span 5; } .c6 { grid-column: span 6; }
+@media (max-width: 980px) { .c7, .c5, .c6 { grid-column: span 12; } }
+.card-h { display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: baseline; justify-content: space-between; }
+.card-h p { margin: 2px 0 0; color: var(--ink-2); font-size: .84rem; max-width: 70ch; }
+.chart { width: 100%; height: 340px; }
+.chart.tall { height: 400px; }
+.chart.short { height: 260px; }
+.legend { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: .8rem; color: var(--ink-2); }
+.legend span { display: inline-flex; align-items: center; gap: 6px; }
+.legend i { width: 12px; height: 3px; border-radius: 2px; background: var(--c); display: inline-block; }
+.legend i.sq { height: 10px; width: 10px; border-radius: 3px; }
+
+/* tablas */
+.tbl-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: .86rem; }
+th, td { padding: 7px 10px; text-align: right; white-space: nowrap; border-bottom: 1px solid var(--grid); }
+th { font-size: .72rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); font-weight: 600; position: sticky; top: 0; background: var(--surface); }
+td:first-child, th:first-child, td.l, th.l { text-align: left; }
+tbody tr:hover td { background: var(--surface-2); }
+tfoot td { font-weight: 700; border-top: 1px solid var(--axis); border-bottom: 0; }
+td .sub { display: block; color: var(--muted); font-size: .75rem; }
+.tag { display: inline-block; padding: 1px 8px; border-radius: 999px; font-size: .75rem; font-weight: 600; background: var(--surface-2); color: var(--ink-2); }
+.tag.buy { color: var(--s1); } .tag.sell { color: var(--bad-ink); } .tag.int { color: var(--ink-2); font-style: italic; }
+.tag.off { opacity: .6; }
+.tbl-scroll { max-height: 480px; overflow: auto; }
+.tools { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.tools input[type="search"], .tools select { border: 1px solid var(--border); background: var(--surface); border-radius: 7px; padding: 5px 9px; font-size: .84rem; }
+.muted { color: var(--muted); }
+details.method { background: var(--surface); border-radius: var(--r); padding: 14px 18px; }
+details.method summary { cursor: pointer; font-family: var(--f-display); font-weight: 650; }
+details.method div { max-width: 78ch; color: var(--ink-2); font-size: .9rem; }
+details.method li { margin-block: 4px; }
+.drop { position: fixed; inset: 0; z-index: 20; display: grid; place-items: center; background: color-mix(in srgb, var(--bg) 80%, transparent); border: 3px dashed var(--s1); font-family: var(--f-display); font-size: 1.4rem; }
+.drop[hidden], .toast[hidden], #dash[hidden], .empty[hidden] { display: none !important; }
+.empty { background: var(--surface); border-radius: var(--r); padding: 22px 24px; display: grid; gap: 10px; max-width: 760px; }
+.empty h2 { font-size: 1.35rem; }
+.empty p, .empty ol { margin: 0; color: var(--ink-2); }
+.empty ol { padding-left: 1.2em; display: grid; gap: 4px; }
+.empty .privacy { background: var(--surface-2); border-radius: 8px; padding: 8px 12px; font-size: .88rem; }
+.toast { position: fixed; left: 50%; bottom: calc(18px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); background: var(--ink); color: var(--bg); padding: 10px 16px; border-radius: 10px; font-size: .88rem; z-index: 30; max-width: min(92vw, 560px); }
+.loading { opacity: .55; transition: opacity .2s; }
+@media (max-width: 560px) { .wrap { padding-inline: 16px; } .chart { height: 290px; } .chart.tall { height: 320px; } .filters { position: static; } }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+</style>
+
+<div class="wrap" id="app">
+  <header class="head">
+    <div>
+      <h1>Mi cartera indexada</h1>
+      <p id="subtitle">Ganancias, aportaciones y evolución de tu cartera de fondos a partir del CSV de órdenes de MyInvestor.</p>
+      <div class="src" id="src"></div>
+    </div>
+    <div class="actions">
+      <input type="file" id="file" accept=".csv,text/csv" hidden>
+      <button class="btn primary" id="btn-upload" type="button">Subir CSV actualizado</button>
+      <button class="btn" id="btn-reset" type="button" hidden>Volver al CSV original</button>
+    </div>
+  </header>
+
+  <section class="empty" id="empty" hidden>
+    <h2>Sube tu CSV de órdenes para ver tu cartera</h2>
+    <p>El panel calcula tus ganancias por año, aportaciones, composición y rentabilidad a partir del archivo de órdenes que exportas de MyInvestor.</p>
+    <ol>
+      <li>Entra en la web de MyInvestor desde un ordenador (la app no permite exportar).</li>
+      <li>Ve a la consulta de órdenes u operaciones de fondos y elige el rango de fechas desde tu primera orden hasta hoy.</li>
+      <li>Descarga el archivo <b>.csv</b> («Órdenes NNNN.csv») y súbelo aquí, o arrástralo a esta página.</li>
+    </ol>
+    <p class="privacy">🔒 El archivo no sale de tu ordenador: se procesa en tu navegador y se guarda solo en él. Nadie más que abra esta página ve tus datos.</p>
+    <div><button class="btn primary" id="btn-upload2" type="button">Elegir CSV de órdenes</button></div>
+  </section>
+  <div id="dash" style="display:grid;gap:18px">
+  <div id="notices" style="display:grid;gap:8px"></div>
+
+  <nav class="filters" aria-label="Filtros">
+    <div class="fgroup">
+      <span class="flabel">Rango</span>
+      <div class="seg" id="presets" role="group" aria-label="Rango de fechas">
+        <button type="button" data-p="all">Todo</button>
+        <button type="button" data-p="acct">Año de cuenta actual</button>
+        <button type="button" data-p="ytd">Este año</button>
+        <button type="button" data-p="12m">12 meses</button>
+        <button type="button" data-p="36m">3 años</button>
+      </div>
+      <label class="muted" for="from" style="font-size:.8rem">Desde</label><input type="date" id="from">
+      <label class="muted" for="to" style="font-size:.8rem">Hasta</label><input type="date" id="to">
+    </div>
+    <div class="fgroup" id="blocks"><span class="flabel">Fondos</span></div>
+    <div class="fgroup">
+      <label class="flabel" for="group">Agrupar por</label>
+      <select id="group">
+        <option value="account">Año de cuenta (31/05)</option>
+        <option value="year">Año natural</option>
+        <option value="quarter">Trimestre</option>
+        <option value="month">Mes</option>
+      </select>
+    </div>
+  </nav>
+
+  <section class="kpis" id="kpis" aria-label="Cifras clave"></section>
+
+  <section class="grid">
+    <article class="card c12">
+      <div class="card-h">
+        <div><h2 id="evo-title">Valor de la cartera y dinero aportado</h2><p id="evo-sub"></p></div>
+        <div class="seg" id="evo-mode" role="group" aria-label="Vista de la evolución">
+          <button type="button" data-m="value" aria-pressed="true">Valor y aportado</button>
+          <button type="button" data-m="gain">Ganancia acumulada</button>
+          <button type="button" data-m="index">Rentabilidad (base 100)</button>
+        </div>
+      </div>
+      <div class="legend" id="evo-legend"></div>
+      <div class="chart tall" id="ch-evo" role="img" aria-label="Evolución del valor de la cartera"></div>
+    </article>
+
+    <article class="card c7">
+      <div class="card-h"><div><h2>Ganancia por periodo</h2><p>Valor final − valor inicial − entradas netas. Pulsa una barra para filtrar ese periodo.</p></div></div>
+      <div class="chart" id="ch-gain" role="img" aria-label="Ganancia por periodo"></div>
+    </article>
+    <article class="card c5">
+      <div class="card-h"><div><h2>De lo aportado al valor final</h2><p>Cómo se llega del valor inicial del rango al final.</p></div></div>
+      <div class="chart" id="ch-fall" role="img" aria-label="Cascada de aportaciones y ganancias"></div>
+    </article>
+
+    <article class="card c6">
+      <div class="card-h"><div><h2>Entradas netas por periodo</h2><p>Compras menos ventas. Los traspasos salen de un bloque y entran en otro.</p></div></div>
+      <div class="legend" id="flow-legend"></div>
+      <div class="chart" id="ch-flow" role="img" aria-label="Entradas netas por periodo y bloque"></div>
+    </article>
+    <article class="card c6">
+      <div class="card-h">
+        <div><h2>Composición</h2><p>Valor de cada bloque de fondos a lo largo del tiempo.</p></div>
+        <div class="seg" id="comp-mode" role="group" aria-label="Unidades de la composición">
+          <button type="button" data-m="eur" aria-pressed="true">€</button>
+          <button type="button" data-m="pct">%</button>
+        </div>
+      </div>
+      <div class="legend" id="comp-legend"></div>
+      <div class="chart" id="ch-comp" role="img" aria-label="Composición por bloques"></div>
+    </article>
+
+    <article class="card c7">
+      <div class="card-h"><div><h2>Rentabilidad mensual</h2><p>Rentabilidad ponderada por tiempo de cada mes, sin el efecto de las aportaciones.</p></div></div>
+      <div class="chart" id="ch-heat" role="img" aria-label="Mapa de rentabilidad mensual"></div>
+    </article>
+    <article class="card c5">
+      <div class="card-h"><div><h2>Caída desde máximos</h2><p>Distancia del índice de rentabilidad a su último máximo.</p></div></div>
+      <div class="chart" id="ch-dd" role="img" aria-label="Caída desde máximos"></div>
+    </article>
+
+    <article class="card c12">
+      <div class="card-h">
+        <div><h2>Detalle por periodo</h2><p>TWR: rentabilidad ponderada por tiempo (no depende de cuándo aportaste). Dietz: rentabilidad sobre el capital medio invertido.</p></div>
+        <button class="btn small" id="dl-periods" type="button" hidden>Descargar CSV</button>
+      </div>
+      <div class="tbl-wrap"><table id="tb-periods"></table></div>
+    </article>
+
+    <article class="card c12">
+      <div class="card-h"><div><h2>Fondos</h2><p>Situación de cada fondo en el rango elegido.</p></div></div>
+      <div class="tbl-wrap"><table id="tb-funds"></table></div>
+    </article>
+
+    <article class="card c12">
+      <div class="card-h">
+        <div><h2>Órdenes</h2><p id="orders-sub"></p></div>
+        <div class="tools">
+          <input type="search" id="q" placeholder="Buscar fondo o ISIN" aria-label="Buscar órdenes">
+          <select id="otype" aria-label="Tipo de orden">
+            <option value="">Todos los tipos</option><option value="buy">Compras</option><option value="sell">Ventas</option>
+            <option value="int">Traspasos</option><option value="other">No ejecutadas</option>
+          </select>
+          <button class="btn small" id="dl-orders" type="button" hidden>Descargar CSV</button>
+        </div>
+      </div>
+      <div class="tbl-wrap tbl-scroll"><table id="tb-orders"></table></div>
+    </article>
+  </section>
+
+  <details class="method" id="method">
+    <summary>Cómo se calcula y cómo actualizarlo</summary>
+    <div>
+      <ul>
+        <li><b>Ganancia de un periodo</b> = valor al final − valor al inicio − entradas netas (compras − ventas) del periodo. Lo que aportas no cuenta como ganancia.</li>
+        <li><b>Valores liquidativos</b>: diarios y oficiales (Morningstar) hasta la fecha indicada arriba. Si el CSV trae órdenes posteriores, el panel estima el valor con los precios de esas órdenes y lo marca como <i>estimado</i>.</li>
+        <li><b>Compras y ventas</b>: el CSV de MyInvestor no dice si una orden es compra o venta. El panel lo deduce: ventas ya identificadas hasta 10/2026 y, después, cualquier orden que vacía un fondo. Si alguna sale mal, cámbiala en la tabla de órdenes.</li>
+        <li><b>Traspasos</b>: una venta seguida en 10 días de compras por el mismo importe se trata como traspaso. Esa fecha se usa para valorar la venta con el precio real.</li>
+        <li><b>No incluido</b>: comisiones de la cartera automatizada (2021-22) y de custodia, que se cobraban de la cuenta corriente, ni las acciones compradas en 2023.</li>
+        <li><b>Actualizar</b>: exporta de nuevo las órdenes desde MyInvestor (web → Consulta de operaciones → Descargar) y súbelas con «Subir CSV actualizado» o arrastrando el archivo aquí. Se recalcula al momento y se guarda <span class="m-save">en el panel</span>. <span class="m-nav">Para tener valores liquidativos exactos de fechas nuevas, pide a Claude: «actualiza los valores liquidativos del panel».</span></li>
+      </ul>
+    </div>
+  </details>
+  </div>
+</div>
+<div class="drop" id="drop" hidden>Suelta aquí el CSV de órdenes</div>
+<div class="toast" id="toast" role="status" hidden></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.5.0/echarts.min.js"></script>
+<script>
+/* Motor de cálculo del panel: CSV de órdenes + valores liquidativos -> series diarias y ganancias.
+   Funciones puras; sin DOM. Días = días desde 01/01/2021 (UTC). */
+const Engine = (() => {
+  const EPOCH = Date.UTC(2021, 0, 1), DAY = 86400000;
+  const pad = n => String(n).padStart(2, "0");
+  const dayOf = (y, m, d) => Math.round((Date.UTC(y, m - 1, d) - EPOCH) / DAY);
+  const ymd = n => { const t = new Date(EPOCH + n * DAY); return { y: t.getUTCFullYear(), m: t.getUTCMonth() + 1, d: t.getUTCDate() }; };
+  const fmt = n => { const t = ymd(n); return `${pad(t.d)}/${pad(t.m)}/${t.y}`; };
+  const iso = n => { const t = ymd(n); return `${t.y}-${pad(t.m)}-${pad(t.d)}`; };
+  const fromIso = s => { const [y, m, d] = s.split("-").map(Number); return dayOf(y, m, d); };
+  const ts = n => EPOCH + n * DAY;
+
+  // Huella anónima de una orden ("ISIN|dd/mm/aaaa|participaciones"): permite reconocer las ventas ya
+  // identificadas sin publicar fechas, fondos ni importes.
+  const fp = str => {
+    let h1 = 0xdeadbeef ^ 7, h2 = 0x41c6ce57 ^ 7;
+    for (let i = 0; i < str.length; i++) { const ch = str.charCodeAt(i); h1 = Math.imul(h1 ^ ch, 2654435761); h2 = Math.imul(h2 ^ ch, 1597334677); }
+    h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507); h1 ^= Math.imul(h2 ^ (h2 >>> 13), 3266489909);
+    h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507); h2 ^= Math.imul(h1 ^ (h1 >>> 13), 3266489909);
+    return (4294967296 * (2097151 & h2) + (h1 >>> 0)).toString(36);
+  };
+  // Ventas identificadas cuadrando participaciones hasta 10/2026 (el CSV no distingue compra/venta).
+  const KNOWN_SELLS = new Set(["1696pdob109","2dcgmf31ful","1f2q1tpdo2f","1p2i05v9i8p","1n0za5fn7tl","1eyu48kjacf","b4fw366xuf",
+    "2duwkt5989f","1hit9wvoek7","1rm07t623mz","1a3jigbkw9d","1qhpg8hopow","2ef99my3x5f","1izfxu3jbgt","nwuxi9dpk3","kyr2ep4bce",
+    "298gfziyrq8","6qxbqo2ovw","2e9yug33hqt","18ap7gi26fj","1aymzp0uxwl","1guv6up0myr","17x2pziboaj","xqp9thx9g","bklqvioi56",
+    "17em8uyb584","1a6spdpdc8f","4s233fch57"]);
+  // Importes reales de reembolso conocidos por los correos de confirmación.
+  const KNOWN_SALE_VALUE = { "17em8uyb584": 6040.79 };
+  const KNOWN_UNTIL = dayOf(2026, 10, 5); // a partir de aquí se aplica la detección automática
+
+  const num = s => {
+    s = (s || "").trim();
+    if (!s) return null;
+    if (s.includes(",") && !s.includes(".")) s = s.replace(",", ".");
+    else s = s.replace(/,/g, "");
+    const v = parseFloat(s);
+    return isFinite(v) ? v : null;
+  };
+
+  function parseCSV(text) {
+    text = text.replace(/^﻿/, "");
+    const lines = text.split(/\r?\n/).filter(l => l.trim());
+    if (!lines.length) throw new Error("El archivo está vacío.");
+    const head = lines[0].split(";").map(s => s.trim().toLowerCase());
+    const col = test => head.findIndex(test);
+    const iF = col(h => h.startsWith("fecha")), iI = col(h => h === "isin"), iA = col(h => h.startsWith("importe")),
+      iU = col(h => h.includes("participaciones")), iE = col(h => h.startsWith("estado"));
+    if ([iF, iI, iA, iU, iE].some(i => i < 0))
+      throw new Error("No reconozco las columnas. Esperaba: Fecha de la orden; ISIN; Importe estimado; Nº de participaciones; Estado.");
+    const orders = [], bad = [];
+    lines.slice(1).forEach((line, k) => {
+      const c = line.split(";");
+      const m = (c[iF] || "").trim().match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
+      if (!m) { bad.push(k + 2); return; }
+      const [amtTxt, cur = "EUR"] = (c[iA] || "").trim().split(/\s+/);
+      orders.push({
+        line: k + 2, dateTxt: m[0], day: dayOf(+m[3], +m[2], +m[1]), isin: (c[iI] || "").trim(),
+        amount: num(amtTxt), cur: cur.toUpperCase(), units: num(c[iU]), state: (c[iE] || "").trim(),
+      });
+    });
+    return { orders, bad };
+  }
+
+  // Valores liquidativos: reales (Morningstar) + estimados a partir de los precios de las propias órdenes.
+  function buildNav(navData, orders) {
+    const series = {};
+    for (const [isin, f] of Object.entries(navData.funds)) {
+      const days = f.nav.map(p => p[0]), vals = f.nav.map(p => p[1]);
+      const exact = new Map(f.nav.map(p => [p[0], p[1]]));
+      series[isin] = { days, vals, exact, last: days[days.length - 1], ext: [] };
+    }
+    for (const o of orders) {
+      if (o.state !== "Finalizada" || !o.units || !o.amount || o.cur !== "EUR") continue;
+      const s = series[o.isin] || (series[o.isin] = { days: [], vals: [], exact: new Map(), last: -Infinity, ext: [] });
+      const d = o.day + 2;
+      if (d > s.last) s.ext.push([d, o.amount / o.units]);
+    }
+    for (const s of Object.values(series)) s.ext.sort((a, b) => a[0] - b[0]);
+    const bs = (arr, x) => { let lo = 0, hi = arr.length - 1, r = -1; while (lo <= hi) { const m = (lo + hi) >> 1; if (arr[m] <= x) { r = m; lo = m + 1; } else hi = m - 1; } return r; };
+    function at(isin, day) {
+      const s = series[isin];
+      if (!s) return { v: 0, est: true };
+      if (s.days.length && day <= s.last) {
+        const i = bs(s.days, day);
+        return { v: s.vals[Math.max(i, 0)], est: false, d: s.days[Math.max(i, 0)] };
+      }
+      const pts = (s.days.length ? [[s.last, s.vals[s.vals.length - 1]]] : []).concat(s.ext);
+      if (!pts.length) return { v: 0, est: true };
+      if (day <= pts[0][0]) return { v: pts[0][1], est: true };
+      for (let k = 1; k < pts.length; k++) if (day <= pts[k][0]) {
+        const [d0, v0] = pts[k - 1], [d1, v1] = pts[k];
+        return { v: v0 + (v1 - v0) * (day - d0) / (d1 - d0), est: true };
+      }
+      return { v: pts[pts.length - 1][1], est: true };
+    }
+    const on = (isin, day) => series[isin] && series[isin].exact.get(day);
+    const lastReal = Math.max(...Object.values(series).map(s => s.last).filter(isFinite));
+    return { at, on, series, lastReal };
+  }
+
+  function classify(orders, overrides) {
+    const fin = orders.filter(o => o.state === "Finalizada" && o.units > 0)
+      .sort((a, b) => a.day - b.day || b.line - a.line);
+    const h = {}, warnings = [];
+    for (const o of fin) {
+      const okey = `${o.isin}|${o.dateTxt}|${o.units}`;
+      let sell;
+      if (overrides && okey in overrides) { sell = overrides[okey]; o.manual = true; }
+      else if (KNOWN_SELLS.has(fp(okey))) sell = true;
+      else if (o.day > KNOWN_UNTIL && (h[o.isin] || 0) > 0 &&
+        Math.abs(o.units - h[o.isin]) <= Math.max(0.002, h[o.isin] * 0.002) && (o.amount || 0) > 500) { sell = true; o.auto = true; }
+      else sell = false;
+      o.sell = sell; o.key = okey;
+      h[o.isin] = (h[o.isin] || 0) + (sell ? -o.units : o.units);
+      if (h[o.isin] < -0.002) warnings.push(`${o.isin}: participaciones negativas tras la orden del ${o.dateTxt}. Revisa si es compra o venta.`);
+    }
+    return { fin, holdings: h, warnings };
+  }
+
+  function execute(fin, nav) {
+    const estVal = o => o.units * nav.at(o.isin, o.day).v;
+    // Traspasos: ventas agrupadas (≤3 días) emparejadas con las compras de los 10 días siguientes.
+    const sells = fin.filter(o => o.sell), buys = fin.filter(o => !o.sell);
+    const clusters = [];
+    for (const s of sells) {
+      const c = clusters[clusters.length - 1];
+      if (c && s.day - c.end <= 3) { c.items.push(s); c.end = s.day; } else clusters.push({ start: s.day, end: s.day, items: [s] });
+    }
+    for (const c of clusters) {
+      const isins = new Set(c.items.map(s => s.isin));
+      const est = c.items.reduce((a, s) => a + estVal(s), 0);
+      const cand = buys.filter(b => !b.internal && b.day >= c.start && b.day <= c.end + 10 && !isins.has(b.isin));
+      const bval = b => b.cur === "EUR" ? b.amount : estVal(b);
+      const options = [];
+      let acc = 0;
+      cand.forEach((b, i) => { acc += bval(b); options.push({ set: cand.slice(0, i + 1), sum: acc }); options.push({ set: [b], sum: bval(b) }); });
+      let best = null;
+      for (const op of options) { const err = Math.abs(op.sum - est) / est; if (err <= 0.06 && (!best || err < best.err)) best = { ...op, err }; }
+      if (best) {
+        const cid = clusters.indexOf(c);
+        best.set.forEach(b => { b.internal = true; b.cluster = cid; });
+        // una fecha de ejecución común: la que hace que lo vendido valga lo comprado
+        let execDay = null, bestErr = Infinity;
+        for (let k = 0; k <= 10; k++) {
+          const d = c.end + k;
+          if (!c.items.some(s => nav.on(s.isin, d) !== undefined)) continue;
+          const err = Math.abs(c.items.reduce((a, s) => a + s.units * nav.at(s.isin, d).v, 0) - best.sum);
+          if (err < bestErr) { bestErr = err; execDay = d; }
+        }
+        c.items.forEach(s => { s.internal = true; s.fixedExec = execDay; s.cluster = cid; });
+      }
+    }
+    for (const o of fin) {
+      const known = KNOWN_SALE_VALUE[fp(o.key)];
+      // ventas sin traspaso: el "importe estimado" no es el real; se usa el primer valor liquidativo posterior
+      const target = o.sell ? (known ?? null) : (o.cur === "EUR" ? o.amount : null);
+      let exec = o.fixedExec ?? null, bestErr = Infinity;
+      for (let k = 0; k <= 10 && o.fixedExec == null; k++) {
+        const v = nav.on(o.isin, o.day + k);
+        if (v === undefined) continue;
+        if (target == null) { exec = o.day + k; if (k > 0) break; else continue; }
+        const err = Math.abs(o.units * v - target);
+        if (err < bestErr) { bestErr = err; exec = o.day + k; }
+      }
+      o.execEst = exec == null;
+      o.exec = exec ?? o.day + 2;
+      o.price = nav.at(o.isin, o.exec).v;
+      o.flow = o.sell ? -o.units * o.price : (o.cur === "EUR" ? o.amount : o.units * o.price);
+      if (known != null) { o.flow = -known; o.price = known / o.units; }
+    }
+    return fin;
+  }
+
+  function timeline(fin, nav, blockOf0) {
+    // Dinero en tránsito durante un traspaso: se guarda como liquidez del bloque destino
+    // para que el valor no caiga a cero entre la venta y la compra.
+    const transit = [];
+    const groups = {};
+    fin.filter(o => o.cluster != null).forEach(o => (groups[o.cluster] = groups[o.cluster] || []).push(o));
+    for (const g of Object.values(groups)) {
+      const sells = g.filter(o => o.sell), buys = g.filter(o => !o.sell);
+      if (!sells.length || !buys.length) continue;
+      const S = sells.reduce((a, o) => a - o.flow, 0), Btot = buys.reduce((a, o) => a + o.flow, 0);
+      const sday = sells[0].exec;
+      const byBlock = {};
+      buys.forEach(b => (byBlock[blockOf0(b.isin)] = byBlock[blockOf0(b.isin)] || []).push(b));
+      for (const [blk, bs] of Object.entries(byBlock)) {
+        const id = "__transito:" + blk, share = S * bs.reduce((a, b) => a + b.flow, 0) / Btot;
+        transit.push({ id, day: sday, amt: share });
+        let left = share;
+        bs.sort((x, y) => x.exec - y.exec).forEach((b, i) => {
+          const out = i === bs.length - 1 ? left : Math.min(left, b.flow);
+          transit.push({ id, day: Math.max(b.exec, sday), amt: -out }); left -= out;
+        });
+      }
+    }
+    const blockOf = i => i.startsWith("__transito:") ? i.slice(11) : blockOf0(i);
+    const isins = [...new Set(fin.map(o => o.isin).concat(transit.map(t => t.id)))];
+    const d0 = Math.min(...fin.map(o => o.exec)) - 1;
+    const end = Math.max(nav.lastReal, ...fin.map(o => o.exec));
+    const n = end - d0 + 1;
+    const V = {}, F = {}, U = {};
+    isins.forEach(i => { V[i] = new Float64Array(n); F[i] = new Float64Array(n); });
+    const est = new Uint8Array(n);
+    const ev = [...fin].sort((a, b) => a.exec - b.exec);
+    let p = 0;
+    for (let k = 0; k < n; k++) {
+      const day = d0 + k;
+      while (p < ev.length && ev[p].exec === day) {
+        const o = ev[p++];
+        U[o.isin] = (U[o.isin] || 0) + (o.sell ? -o.units : o.units);
+        if (Math.abs(U[o.isin]) < 0.0015) U[o.isin] = 0;
+        F[o.isin][k] += o.flow;
+      }
+      for (const t of transit) if (t.day === day) { U[t.id] = (U[t.id] || 0) + t.amt; F[t.id][k] += t.amt; }
+      for (const i of isins) {
+        const u = U[i] || 0;
+        if (!u) continue;
+        if (i.startsWith("__transito:")) { V[i][k] = Math.abs(u) < 0.005 ? 0 : u; continue; }
+        const q = nav.at(i, day);
+        V[i][k] = u * q.v;
+        if (q.est) est[k] = 1;
+      }
+    }
+    return { d0, end, n, isins, V, F, est, blockOf, units: U, transit };
+  }
+
+  // Agregados para un conjunto de fondos
+  function aggregate(tl, isinFilter) {
+    const v = new Float64Array(tl.n), f = new Float64Array(tl.n);
+    for (const i of tl.isins) if (isinFilter(i)) { const Vi = tl.V[i], Fi = tl.F[i]; for (let k = 0; k < tl.n; k++) { v[k] += Vi[k]; f[k] += Fi[k]; } }
+    const cf = new Float64Array(tl.n); let s = 0;
+    for (let k = 0; k < tl.n; k++) { s += f[k]; cf[k] = s; }
+    // índice de rentabilidad ponderada por tiempo (TWR)
+    const idx = new Float64Array(tl.n); idx[0] = 1;
+    for (let k = 1; k < tl.n; k++) {
+      const den = v[k - 1] + Math.max(0, f[k]);
+      const r = den > 1 ? (v[k] - v[k - 1] - f[k]) / den : 0;
+      idx[k] = idx[k - 1] * (1 + r);
+    }
+    return { v, f, cf, idx };
+  }
+
+  const clampK = (tl, day) => Math.min(Math.max(day - tl.d0, 0), tl.n - 1);
+  function period(tl, ag, a, b) {
+    const ka = clampK(tl, a), kb = clampK(tl, b);
+    const v0 = a < tl.d0 ? 0 : ag.v[ka], v1 = ag.v[kb];
+    const flows = ag.cf[kb] - (a < tl.d0 ? 0 : ag.cf[ka]);
+    const gain = v1 - v0 - flows;
+    const ia = a < tl.d0 ? 1 : ag.idx[ka];
+    const twr = ag.idx[kb] / ia - 1;
+    let w = 0; const span = Math.max(kb - ka, 1);
+    for (let k = ka + 1; k <= kb; k++) w += ag.f[k] * (kb - k) / span;
+    const dietzDen = v0 + w;
+    const dietz = dietzDen > 1 ? gain / dietzDen : null;
+    return { a, b, v0, v1, flows, gain, twr, dietz };
+  }
+
+  function xirr(tl, ag, a, b) {
+    const ka = clampK(tl, a), kb = clampK(tl, b);
+    const cfs = [];
+    if (a >= tl.d0 && ag.v[ka] > 0) cfs.push([0, -ag.v[ka]]);
+    for (let k = ka + 1; k <= kb; k++) if (ag.f[k]) cfs.push([(k - ka) / 365.25, -ag.f[k]]);
+    cfs.push([(kb - ka) / 365.25, ag.v[kb]]);
+    const npv = r => cfs.reduce((s, [t, c]) => s + c / Math.pow(1 + r, t), 0);
+    let lo = -0.95, hi = 5, flo = npv(lo), fhi = npv(hi);
+    if (!(flo * fhi < 0)) return null;
+    for (let it = 0; it < 200; it++) { const m = (lo + hi) / 2, fm = npv(m); if (flo * fm <= 0) { hi = m; fhi = fm; } else { lo = m; flo = fm; } }
+    return (lo + hi) / 2;
+  }
+
+  function maxDrawdown(ag, ka, kb) {
+    let peak = -Infinity, mdd = 0;
+    const dd = new Float64Array(kb - ka + 1);
+    for (let k = ka; k <= kb; k++) { peak = Math.max(peak, ag.idx[k]); dd[k - ka] = ag.idx[k] / peak - 1; mdd = Math.min(mdd, dd[k - ka]); }
+    return { mdd, dd };
+  }
+
+  // Cortes de periodo: devuelve [{label, a, b, partial}]
+  function periods(kind, from, to) {
+    const out = [];
+    const ends = [];
+    const s = ymd(from), e = ymd(to);
+    if (kind === "account") for (let y = s.y - 1; y <= e.y + 1; y++) ends.push({ day: dayOf(y, 5, 31), label: y => `${y - 1}-${String(y).slice(2)}`, y });
+    if (kind === "year") for (let y = s.y - 1; y <= e.y + 1; y++) ends.push({ day: dayOf(y, 12, 31), label: y => `${y}`, y });
+    if (kind === "quarter") for (let y = s.y - 1; y <= e.y + 1; y++) for (let q = 1; q <= 4; q++) ends.push({ day: dayOf(y, q * 3 + 1, 1) - 1, label: () => `T${q} ${y}`, y });
+    if (kind === "month") for (let y = s.y - 1; y <= e.y + 1; y++) for (let m = 1; m <= 12; m++) ends.push({ day: dayOf(y, m + 1, 1) - 1, label: () => `${MONTHS[m - 1]} ${y}`, y });
+    ends.sort((p, q) => p.day - q.day);
+    for (let i = 1; i < ends.length; i++) {
+      const a0 = ends[i - 1].day, b0 = ends[i].day;
+      if (b0 <= from || a0 >= to) continue;
+      const a = Math.max(a0, from), b = Math.min(b0, to);
+      out.push({ label: ends[i].label(ends[i].y), a, b, partial: a !== a0 || b !== b0 });
+    }
+    return out;
+  }
+  const MONTHS = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"];
+
+  function run(csvText, navData, overrides) {
+    const { orders, bad } = parseCSV(csvText);
+    const nav = buildNav(navData, orders);
+    const { fin, holdings, warnings } = classify(orders, overrides);
+    if (!fin.length) throw new Error("El CSV no tiene órdenes finalizadas.");
+    execute(fin, nav);
+    const blockOf = i => (navData.funds[i] && navData.funds[i].block) || "Otros";
+    const tl = timeline(fin, nav, blockOf);
+    const unknown = tl.isins.filter(i => !navData.funds[i] && !i.startsWith("__transito:"));
+    return { orders, bad, fin, holdings, warnings, nav, tl, unknown };
+  }
+
+  return { run, aggregate, period, periods, xirr, maxDrawdown, fmt, iso, fromIso, ts, ymd, dayOf, MONTHS, KNOWN_UNTIL };
+})();
+if (typeof module !== "undefined") module.exports = Engine;
+
+</script>
+<script>
+(() => {
+const $ = s => document.querySelector(s);
+const E = Engine;
+const BLOCKS = ["Desarrollados", "Emergentes", "Monetario", "Cartera automatizada", "Otros"];
+const BCOLOR = { "Desarrollados": "--s1", "Emergentes": "--s2", "Monetario": "--s3", "Cartera automatizada": "--s4", "Otros": "--s5" };
+const eur = new Intl.NumberFormat("es-ES", { style: "currency", currency: "EUR", minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const eur0 = new Intl.NumberFormat("es-ES", { style: "currency", currency: "EUR", maximumFractionDigits: 0 });
+const nf = (d) => new Intl.NumberFormat("es-ES", { minimumFractionDigits: d, maximumFractionDigits: d });
+const pct = (x, d = 1) => x == null || !isFinite(x) ? "—" : (x > 0 ? "+" : "") + nf(d).format(x * 100) + " %";
+const sgn = (x, f = eur) => (x > 0 ? "+" : "") + f.format(x);
+const kfmt = v => { const a = Math.abs(v); return a >= 1000 ? nf(a >= 10000 ? 0 : 1).format(v / 1000) + " k€" : nf(0).format(v) + " €"; };
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const esc = s => String(s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
+const store = {
+  get(k) { try { return JSON.parse(localStorage.getItem(k)); } catch { return null; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} },
+  del(k) { try { localStorage.removeItem(k); } catch {} },
+};
+
+let NAV = null, CSV = null, CSVNAME = "", CSVSOURCE = "embedded", OVERRIDES = {}, R = null, db = null, downloads = null;
+const ui = Object.assign({ preset: "all", from: null, to: null, blocks: null, group: "account", evo: "value", comp: "eur" }, store.get("panel-ui") || {});
+const charts = {};
+
+function toast(msg) { const t = $("#toast"); t.textContent = msg; t.hidden = false; clearTimeout(toast.t); toast.t = setTimeout(() => t.hidden = true, 5200); }
+
+// ---------- carga ----------
+const IN_CLAUDE = !!(window.claude && window.claude.use);
+let EMBEDDED = null;
+function show() {
+  const has = !!CSV;
+  $("#empty").hidden = has; $("#dash").hidden = !has;
+  $("#btn-reset").hidden = !has || (CSVSOURCE === "embedded");
+  $("#btn-reset").textContent = EMBEDDED ? "Volver al CSV original" : "Borrar mis datos de este navegador";
+  if (!has) { $("#src").innerHTML = `<span class="chip">Valores liquidativos hasta ${E.fmt(Math.max(...Object.values(NAV.funds).map(f => f.nav.length ? f.nav[f.nav.length - 1][0] : 0)))}</span>`; return; }
+  compute(); render();
+}
+async function boot() {
+  const [n, c] = await Promise.all([fetch("data/navs.json").then(r => r.json()),
+    fetch("data/ordenes.csv").then(r => r.ok ? r.text() : null).catch(() => null)]);
+  NAV = n; EMBEDDED = c; CSV = c; CSVNAME = c ? "Órdenes 153906.csv" : "";
+  const local = store.get("panel-csv");
+  if (local && local.csv) { CSV = local.csv; CSVNAME = local.name; CSVSOURCE = "local"; }
+  OVERRIDES = store.get("panel-overrides") || {};
+  if (!IN_CLAUDE) {
+    document.querySelectorAll(".m-save").forEach(e => e.textContent = "solo en tu navegador");
+    document.querySelectorAll(".m-nav").forEach(e => e.textContent = "Los valores liquidativos se actualizan solos cada día laborable.");
+    $("#dl-periods").hidden = $("#dl-orders").hidden = false;
+  }
+  show();
+  // capacidades del visor: guardado compartido y descargas
+  if (IN_CLAUDE) {
+    window.claude.use("downloads").then(d => { downloads = d; $("#dl-periods").hidden = $("#dl-orders").hidden = !d; });
+    window.claude.use("db").then(async d => {
+      db = d; if (!db) return;
+      try {
+        const [doc, adj] = await Promise.all([db.doc("panel/datos").get(), db.doc("panel/ajustes").get()]);
+        let changed = false;
+        if (doc.exists && doc.data().csv) { CSV = doc.data().csv; CSVNAME = doc.data().name || "CSV subido"; CSVSOURCE = "db"; changed = true; }
+        if (adj.exists && adj.data().overrides) { OVERRIDES = { ...adj.data().overrides }; changed = true; }
+        if (changed) show();
+      } catch (e) { /* sin guardado compartido: se usa este navegador */ }
+    });
+  }
+}
+
+function compute() {
+  R = E.run(CSV, NAV, OVERRIDES);
+  const present = BLOCKS.filter(b => R.tl.isins.some(i => R.tl.blockOf(i) === b));
+  R.blocksPresent = present;
+  if (!ui.blocks || !ui.blocks.some(b => present.includes(b))) ui.blocks = present.slice();
+  R.aggCache = new Map();
+  R.lastNav = Math.min(...R.tl.isins.filter(i => !i.startsWith("__transito:") && (R.tl.units[i] || 0) > 0).map(i => (R.nav.series[i] && isFinite(R.nav.series[i].last)) ? R.nav.series[i].last : -1));
+}
+function agg(blocks) {
+  const key = blocks.slice().sort().join("|");
+  if (!R.aggCache.has(key)) R.aggCache.set(key, E.aggregate(R.tl, i => blocks.includes(R.tl.blockOf(i))));
+  return R.aggCache.get(key);
+}
+function aggFund(isin) {
+  const key = "f:" + isin;
+  if (!R.aggCache.has(key)) R.aggCache.set(key, E.aggregate(R.tl, i => i === isin));
+  return R.aggCache.get(key);
+}
+function range() {
+  const tl = R.tl, end = tl.end, start = tl.d0;
+  const lastAnniv = (() => { const y = E.ymd(end).y; const d = E.dayOf(y, 5, 31); return d <= end ? d : E.dayOf(y - 1, 5, 31); })();
+  let a = start, b = end;
+  if (ui.preset === "acct") a = lastAnniv;
+  else if (ui.preset === "ytd") a = E.dayOf(E.ymd(end).y, 1, 1) - 1;
+  else if (ui.preset === "12m") a = end - 365;
+  else if (ui.preset === "36m") a = end - 3 * 365;
+  else if (ui.preset === "custom") { a = ui.from != null ? E.fromIso(ui.from) : start; b = ui.to != null ? E.fromIso(ui.to) : end; }
+  a = Math.max(a, start); b = Math.min(Math.max(b, a + 1), end);
+  return [a, b];
+}
+const fundName = i => (NAV.funds[i] && NAV.funds[i].name) || i;
+
+// ---------- render ----------
+function render() {
+  store.set("panel-ui", { preset: ui.preset, from: ui.from, to: ui.to, blocks: ui.blocks, group: ui.group, evo: ui.evo, comp: ui.comp });
+  const [a, b] = range();
+  const ag = agg(ui.blocks);
+  renderHeader(); renderFilters(a, b); renderKpis(ag, a, b);
+  renderEvo(ag, a, b); renderGains(ag, a, b); renderFall(ag, a, b); renderFlows(a, b); renderComp(a, b);
+  renderHeat(ag, a, b); renderDD(ag, a, b); renderPeriods(ag, a, b); renderFunds(a, b); renderOrders(a, b);
+}
+
+function renderHeader() {
+  const nOrd = R.orders.length, nFin = R.fin.length;
+  const lastOrder = Math.max(...R.orders.map(o => o.day));
+  const src = { embedded: "CSV inicial", local: "Guardado en este navegador", db: "Guardado en el panel" }[CSVSOURCE];
+  $("#src").innerHTML = [
+    `<span class="chip">${esc(CSVNAME)} · ${src}</span>`,
+    `<span class="chip">${nFin} órdenes ejecutadas de ${nOrd}</span>`,
+    `<span class="chip">Última orden ${E.fmt(lastOrder)}</span>`,
+    `<span class="chip ${R.tl.end > R.nav.lastReal ? "est" : ""}">Valores liquidativos exactos hasta ${E.fmt(R.nav.lastReal)}</span>`,
+  ].join("");
+  $("#subtitle").textContent = `Ganancias, aportaciones y evolución desde tu primera orden, el ${E.fmt(Math.min(...R.orders.map(o => o.day)))}.`;
+  const notes = [];
+  if (R.tl.end > R.nav.lastReal || R.unknown.length)
+    notes.push(`<div class="notice"><span>⚠</span><span>Hay <b>valores estimados</b> después del ${E.fmt(R.nav.lastReal)}${R.unknown.length ? ` y para ${R.unknown.length} fondo(s) sin histórico (${R.unknown.map(esc).join(", ")})` : ""}: se calculan con los precios de tus órdenes. ${IN_CLAUDE ? "Para tener los exactos, pide a Claude «actualiza los valores liquidativos del panel»." : "Los exactos se añaden solos cada día laborable; vuelve a abrir el panel más adelante."}</span></div>`);
+  R.warnings.forEach(w => notes.push(`<div class="notice"><span>⚠</span><span>${esc(w)}</span></div>`));
+  if (R.bad.length) notes.push(`<div class="notice"><span>⚠</span><span>${R.bad.length} línea(s) del CSV sin fecha válida se han ignorado (líneas ${R.bad.slice(0, 8).join(", ")}${R.bad.length > 8 ? "…" : ""}).</span></div>`);
+  const auto = R.fin.filter(o => o.auto);
+  if (auto.length) notes.push(`<div class="notice ok"><span>ℹ</span><span>${auto.length} orden(es) nueva(s) se han tomado como venta porque vacían el fondo (${auto.map(o => esc(fundName(o.isin)) + " " + o.dateTxt).join("; ")}). Si no es así, cámbialo en la tabla de órdenes.</span></div>`);
+  $("#notices").innerHTML = notes.join("");
+}
+
+function renderFilters(a, b) {
+  document.querySelectorAll("#presets button").forEach(bt => bt.setAttribute("aria-pressed", String(bt.dataset.p === ui.preset)));
+  const f = $("#from"), t = $("#to");
+  f.min = t.min = E.iso(R.tl.d0); f.max = t.max = E.iso(R.tl.end);
+  f.value = E.iso(a); t.value = E.iso(b);
+  $("#group").value = ui.group;
+  const box = $("#blocks");
+  box.querySelectorAll(".bchip").forEach(x => x.remove());
+  R.blocksPresent.forEach(bl => {
+    const el = document.createElement("button");
+    el.type = "button"; el.className = "bchip"; el.style.setProperty("--c", `var(${BCOLOR[bl]})`);
+    el.setAttribute("aria-pressed", String(ui.blocks.includes(bl)));
+    el.innerHTML = `<span class="dot"></span>${esc(bl)}`;
+    el.onclick = () => {
+      const on = ui.blocks.includes(bl);
+      if (on && ui.blocks.length === 1) { toast("Deja al menos un bloque de fondos seleccionado."); return; }
+      ui.blocks = on ? ui.blocks.filter(x => x !== bl) : [...ui.blocks, bl];
+      render();
+    };
+    box.appendChild(el);
+  });
+}
+
+function renderKpis(ag, a, b) {
+  const p = E.period(R.tl, ag, a, b);
+  const ka = Math.max(a - R.tl.d0, 0), kb = b - R.tl.d0;
+  const x = E.xirr(R.tl, ag, a, b);
+  const { mdd } = E.maxDrawdown(ag, ka, kb);
+  const years = (b - a) / 365.25;
+  const tile = (k, v, s, cls = "", vcls = "") => `<div class="kpi ${cls}"><span class="k">${k}</span><span class="v ${vcls}">${v}</span><span class="s">${s}</span></div>`;
+  $("#kpis").innerHTML = [
+    tile("Ganancia en el rango", sgn(p.gain), `${E.fmt(a)} → ${E.fmt(b)}`, "hero"),
+    tile("Valor final", eur.format(p.v1), p.v0 > 0 ? `Valor inicial ${eur.format(p.v0)}` : "Partiendo de cero"),
+    tile("Entradas netas", eur.format(p.flows), "Compras − ventas en el rango"),
+    tile("Rentabilidad (TWR)", pct(p.twr), years >= 1 ? `${pct(Math.pow(1 + p.twr, 1 / years) - 1)} anual` : "Sin anualizar (menos de 1 año)", "", p.twr >= 0 ? "pos-t" : "neg-t"),
+    tile("TIR anual", years >= 0.5 && x != null ? pct(x) : "—", "Rentabilidad de tu dinero según cuándo entró", "", x >= 0 ? "pos-t" : "neg-t"),
+    tile("Máxima caída", pct(mdd), "Del índice de rentabilidad, en el rango", "", "neg-t"),
+  ].join("");
+}
+
+// ---------- utilidades de gráficas ----------
+function chart(id) {
+  const el = document.getElementById(id);
+  if (!charts[id]) {
+    charts[id] = echarts.init(el, null, { renderer: "canvas" });
+    new ResizeObserver(() => charts[id].resize()).observe(el);
+  }
+  return charts[id];
+}
+function base() {
+  const ink2 = css("--ink-2"), muted = css("--muted"), grid = css("--grid"), axis = css("--axis");
+  return {
+    textStyle: { fontFamily: "Figtree, system-ui, sans-serif", color: ink2 },
+    animationDuration: 350,
+    grid: { left: 8, right: 16, top: 16, bottom: 8, containLabel: true },
+    tooltip: {
+      trigger: "axis", backgroundColor: css("--surface"), borderColor: css("--border"), borderWidth: 1,
+      textStyle: { color: css("--ink"), fontSize: 12 }, extraCssText: "box-shadow:0 6px 24px rgba(0,0,0,.14);border-radius:8px;",
+      axisPointer: { type: "line", lineStyle: { color: axis, width: 1 } },
+    },
+    xAxis: { axisLine: { lineStyle: { color: axis } }, axisTick: { show: false }, axisLabel: { color: muted, fontSize: 11 }, splitLine: { show: false } },
+    yAxis: { axisLine: { show: false }, axisTick: { show: false }, axisLabel: { color: muted, fontSize: 11 }, splitLine: { lineStyle: { color: grid, width: 1 } } },
+  };
+}
+const tsRange = (a, b, step = 1) => { const out = []; for (let d = a; d <= b; d += step) out.push(d); if (out[out.length - 1] !== b) out.push(b); return out; };
+const dateLabel = v => { const t = E.ymd(Math.round((v - E.ts(0)) / 86400000)); return `${E.MONTHS[t.m - 1]} ${String(t.y).slice(2)}`; };
+const tipHead = ts => `<b>${E.fmt(Math.round((ts - E.ts(0)) / 86400000))}</b>`;
+const legendHTML = items => items.map(([lbl, c, sq]) => `<span><i class="${sq ? "sq" : ""}" style="--c:${c}"></i>${esc(lbl)}</span>`).join("");
+function estArea(a, b) {
+  if (b <= R.nav.lastReal) return null;
+  return { silent: true, itemStyle: { color: css("--est") }, label: { show: true, position: "insideTopRight", color: css("--warn-ink"), fontSize: 11, formatter: "estimado" },
+    data: [[{ xAxis: E.ts(Math.max(R.nav.lastReal, a)) }, { xAxis: E.ts(b) }]] };
+}
+function annivLines(a, b) {
+  const out = [];
+  for (let y = 2022; y <= E.ymd(b).y; y++) { const d = E.dayOf(y, 5, 31); if (d > a && d < b) out.push({ xAxis: E.ts(d) }); }
+  return { silent: true, symbol: "none", lineStyle: { color: css("--axis"), type: "solid", width: 1 }, label: { show: true, formatter: p => "31/05/" + String(E.ymd(Math.round((p.value - E.ts(0)) / 86400000)).y).slice(2), color: css("--muted"), fontSize: 10, position: "insideEndTop" }, data: out };
+}
+
+function renderEvo(ag, a, b) {
+  const tl = R.tl, ka = a - tl.d0, step = (b - a) > 900 ? 2 : 1;
+  const days = tsRange(a, b, step);
+  const k0 = Math.max(ka, 0), v0 = a < tl.d0 ? 0 : ag.v[k0], cf0 = a < tl.d0 ? 0 : ag.cf[k0], i0 = ag.idx[k0];
+  const B = base(), s1 = css("--s1"), ink2 = css("--ink-2");
+  let series, legend, title, sub, yfmt = kfmt;
+  if (ui.evo === "value") {
+    title = "Valor de la cartera y dinero aportado";
+    sub = "El hueco entre las dos líneas es lo que han ganado tus fondos.";
+    series = [
+      { name: "Valor", type: "line", showSymbol: false, sampling: "lttb", lineStyle: { width: 2, color: s1 }, itemStyle: { color: s1 },
+        areaStyle: { color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [{ offset: 0, color: s1 + "33" }, { offset: 1, color: s1 + "05" }]) },
+        data: days.map(d => [E.ts(d), ag.v[d - tl.d0]]), markArea: estArea(a, b), markLine: annivLines(a, b) },
+      { name: "Aportado neto", type: "line", step: "end", showSymbol: false, lineStyle: { width: 2, color: ink2 }, itemStyle: { color: ink2 },
+        data: days.map(d => [E.ts(d), v0 + ag.cf[d - tl.d0] - cf0]) },
+    ];
+    legend = [["Valor", s1], [a > tl.d0 ? "Valor inicial + entradas netas" : "Aportado neto acumulado", ink2]];
+  } else if (ui.evo === "gain") {
+    title = "Ganancia acumulada desde el inicio del rango";
+    sub = "Valor − valor inicial − entradas netas, día a día.";
+    const pos = css("--pos"), neg = css("--neg");
+    series = [{ name: "Ganancia", type: "line", showSymbol: false, sampling: "lttb", lineStyle: { width: 2 },
+      data: days.map(d => [E.ts(d), ag.v[d - tl.d0] - v0 - (ag.cf[d - tl.d0] - cf0)]), areaStyle: { opacity: .12 },
+      markLine: { silent: true, symbol: "none", lineStyle: { color: css("--axis"), type: "solid" }, label: { show: false }, data: [{ yAxis: 0 }] }, markArea: estArea(a, b) }];
+    B.visualMap = { show: false, type: "piecewise", dimension: 1, pieces: [{ lt: 0, color: neg }, { gte: 0, color: pos }] };
+    legend = [["Ganancia ≥ 0", pos], ["Ganancia < 0", neg]];
+  } else {
+    title = "Rentabilidad ponderada por tiempo (base 100)";
+    sub = "Cómo habrían crecido 100 € invertidos al inicio del rango, sin efecto de las aportaciones.";
+    yfmt = v => nf(0).format(v);
+    series = [{ name: "Índice", type: "line", showSymbol: false, sampling: "lttb", lineStyle: { width: 2, color: s1 }, itemStyle: { color: s1 },
+      data: days.map(d => [E.ts(d), ag.idx[d - tl.d0] / i0 * 100]), markArea: estArea(a, b), markLine: annivLines(a, b) }];
+    legend = [["Índice (base 100)", s1]];
+  }
+  $("#evo-title").textContent = title; $("#evo-sub").textContent = sub;
+  $("#evo-legend").innerHTML = legendHTML(legend);
+  document.querySelectorAll("#evo-mode button").forEach(bt => bt.setAttribute("aria-pressed", String(bt.dataset.m === ui.evo)));
+  chart("ch-evo").setOption({
+    ...B,
+    tooltip: { ...B.tooltip, formatter: ps => tipHead(ps[0].value[0]) + ps.map(p => `<br>${p.marker}${p.seriesName}: <b>${ui.evo === "index" ? nf(1).format(p.value[1]) : eur.format(p.value[1])}</b>`).join("")
+      + (ui.evo === "value" && ps.length > 1 ? `<br><span style="opacity:.75">Ganancia: ${sgn(ps[0].value[1] - ps[1].value[1])}</span>` : "") },
+    xAxis: { ...B.xAxis, type: "time", min: E.ts(a), max: E.ts(b), axisLabel: { ...B.xAxis.axisLabel, formatter: dateLabel, hideOverlap: true } },
+    yAxis: { ...B.yAxis, type: "value", scale: ui.evo === "index", axisLabel: { ...B.yAxis.axisLabel, formatter: yfmt } },
+    series,
+  }, true);
+}
+
+function periodData(ag, a, b) {
+  return E.periods(ui.group, a, b).map(p => ({ ...p, ...E.period(R.tl, ag, p.a, p.b), label: p.label + (p.partial ? "*" : "") }));
+}
+
+function renderGains(ag, a, b) {
+  const P = periodData(ag, a, b), B = base(), pos = css("--pos"), neg = css("--neg");
+  const c = chart("ch-gain");
+  c.setOption({
+    ...B,
+    grid: { ...B.grid, top: 24 },
+    tooltip: { ...B.tooltip, trigger: "item", formatter: p => { const x = P[p.dataIndex]; return `<b>${esc(x.label)}</b> <span style="opacity:.7">${E.fmt(x.a)} → ${E.fmt(x.b)}</span><br>Ganancia: <b>${sgn(x.gain)}</b><br>Entradas netas: ${eur.format(x.flows)}<br>TWR: ${pct(x.twr, 2)}`; } },
+    xAxis: { ...B.xAxis, type: "category", data: P.map(p => p.label), axisLabel: { ...B.xAxis.axisLabel, hideOverlap: true } },
+    yAxis: { ...B.yAxis, type: "value", axisLabel: { ...B.yAxis.axisLabel, formatter: kfmt } },
+    series: [{ type: "bar", barMaxWidth: 46, cursor: "pointer",
+      data: P.map(p => ({ value: p.gain, itemStyle: { color: p.gain >= 0 ? pos : neg, borderRadius: p.gain >= 0 ? [4, 4, 0, 0] : [0, 0, 4, 4] } })),
+      label: { show: P.length <= 10, position: "top", color: css("--ink-2"), fontSize: 11, formatter: p => (p.value > 0 ? "+" : "") + kfmt(p.value) },
+      labelLayout: { hideOverlap: true } }],
+  }, true);
+  c.off("click");
+  c.on("click", p => { const x = P[p.dataIndex]; ui.preset = "custom"; ui.from = E.iso(x.a); ui.to = E.iso(x.b); render(); toast(`Rango: ${x.label.replace("*", "")} (${E.fmt(x.a)} → ${E.fmt(x.b)})`); });
+}
+
+function renderFall(ag, a, b) {
+  const P = periodData(ag, a, b), B = base();
+  const p = E.period(R.tl, ag, a, b);
+  const items = [];
+  if (p.v0 > 0) items.push({ name: "Valor inicial", v: p.v0, total: true });
+  items.push({ name: "Entradas netas", v: p.flows, flow: true });
+  if (P.length <= 14) P.forEach(x => items.push({ name: x.label, v: x.gain }));
+  else items.push({ name: "Ganancia", v: p.gain });
+  items.push({ name: "Valor final", v: p.v1, total: true });
+  let acc = 0; const baseS = [], up = [];
+  items.forEach(it => {
+    if (it.total) { baseS.push(0); up.push(it.v); acc = it.v; }
+    else { const lo = it.v >= 0 ? acc : acc + it.v; baseS.push(lo); up.push(Math.abs(it.v)); acc += it.v; }
+  });
+  const colors = items.map(it => it.total ? css("--ink-2") : it.flow ? css("--axis") : it.v >= 0 ? css("--pos") : css("--neg"));
+  chart("ch-fall").setOption({
+    ...B,
+    grid: { ...B.grid, top: 24 },
+    tooltip: { ...B.tooltip, trigger: "item", formatter: q => `<b>${esc(items[q.dataIndex].name)}</b><br>${items[q.dataIndex].total ? eur.format(items[q.dataIndex].v) : sgn(items[q.dataIndex].v)}` },
+    xAxis: { ...B.xAxis, type: "category", data: items.map(i => i.name), axisLabel: { ...B.xAxis.axisLabel, interval: 0, rotate: items.length > 6 ? 35 : 0 } },
+    yAxis: { ...B.yAxis, type: "value", axisLabel: { ...B.yAxis.axisLabel, formatter: kfmt } },
+    series: [
+      { type: "bar", stack: "w", silent: true, itemStyle: { color: "transparent" }, data: baseS, tooltip: { show: false } },
+      { type: "bar", stack: "w", barMaxWidth: 40, data: up.map((v, i) => ({ value: v, itemStyle: { color: colors[i], borderRadius: 4 } })),
+        label: { show: items.length <= 9, position: "top", fontSize: 10, color: css("--ink-2"), formatter: q => items[q.dataIndex].total ? kfmt(items[q.dataIndex].v) : (items[q.dataIndex].v > 0 ? "+" : "−") + kfmt(Math.abs(items[q.dataIndex].v)) } },
+    ],
+  }, true);
+}
+
+function renderFlows(a, b) {
+  const B = base(), blocks = R.blocksPresent.filter(x => ui.blocks.includes(x));
+  const P = E.periods(ui.group, a, b);
+  const series = blocks.map(bl => {
+    const ag = agg([bl]);
+    return { name: bl, type: "bar", stack: "f", barMaxWidth: 40, itemStyle: { color: css(BCOLOR[bl]), borderColor: css("--surface"), borderWidth: 1 },
+      emphasis: { focus: "series" }, data: P.map(p => +(E.period(R.tl, ag, p.a, p.b).flows).toFixed(2)) };
+  });
+  $("#flow-legend").innerHTML = legendHTML(blocks.map(bl => [bl, `var(${BCOLOR[bl]})`, true]));
+  chart("ch-flow").setOption({
+    ...B,
+    tooltip: { ...B.tooltip, axisPointer: { type: "shadow" }, formatter: ps => `<b>${esc(ps[0].axisValue)}</b>` + ps.filter(p => p.value).map(p => `<br>${p.marker}${esc(p.seriesName)}: <b>${sgn(p.value)}</b>`).join("") + `<br>Total: <b>${sgn(ps.reduce((s, p) => s + p.value, 0))}</b>` },
+    xAxis: { ...B.xAxis, type: "category", data: P.map(p => p.label + (p.partial ? "*" : "")), axisLabel: { ...B.xAxis.axisLabel, hideOverlap: true } },
+    yAxis: { ...B.yAxis, type: "value", axisLabel: { ...B.yAxis.axisLabel, formatter: kfmt } },
+    series,
+  }, true);
+}
+
+function renderComp(a, b) {
+  const B = base(), tl = R.tl, blocks = R.blocksPresent.filter(x => ui.blocks.includes(x));
+  const days = tsRange(a, b, (b - a) > 900 ? 3 : 1);
+  const vals = blocks.map(bl => agg([bl]).v);
+  const tot = days.map(d => vals.reduce((s, v) => s + v[d - tl.d0], 0));
+  const pctMode = ui.comp === "pct";
+  document.querySelectorAll("#comp-mode button").forEach(bt => bt.setAttribute("aria-pressed", String(bt.dataset.m === ui.comp)));
+  $("#comp-legend").innerHTML = legendHTML(blocks.map(bl => [bl, `var(${BCOLOR[bl]})`, true]));
+  chart("ch-comp").setOption({
+    ...B,
+    tooltip: { ...B.tooltip, formatter: ps => tipHead(ps[0].value[0]) + ps.filter(p => p.value[1] > 0.005).map(p => `<br>${p.marker}${esc(p.seriesName)}: <b>${pctMode ? nf(1).format(p.value[1]) + " %" : eur.format(p.value[1])}</b>`).join("") },
+    xAxis: { ...B.xAxis, type: "time", min: E.ts(a), max: E.ts(b), axisLabel: { ...B.xAxis.axisLabel, formatter: dateLabel, hideOverlap: true } },
+    yAxis: { ...B.yAxis, type: "value", max: pctMode ? 100 : null, axisLabel: { ...B.yAxis.axisLabel, formatter: pctMode ? (v => v + " %") : kfmt } },
+    series: blocks.map((bl, j) => ({ name: bl, type: "line", stack: "c", showSymbol: false, lineStyle: { width: 1, color: css("--surface") },
+      areaStyle: { color: css(BCOLOR[bl]), opacity: .9 }, itemStyle: { color: css(BCOLOR[bl]) },
+      data: days.map((d, i) => [E.ts(d), pctMode ? (tot[i] > 0 ? vals[j][d - tl.d0] / tot[i] * 100 : 0) : vals[j][d - tl.d0]]) })),
+  }, true);
+}
+
+function renderHeat(ag, a, b) {
+  const B = base(), tl = R.tl;
+  const months = E.periods("month", a, b);
+  const years = [...new Set(months.map(m => E.ymd(m.b).y))];
+  const data = months.map(m => {
+    const r = ag.idx[m.b - tl.d0] / ag.idx[Math.max(m.a - tl.d0, 0)] - 1;
+    return [E.ymd(m.b).m - 1, years.indexOf(E.ymd(m.b).y), +(r * 100).toFixed(2), m.partial];
+  });
+  const lim = Math.max(2, ...data.map(d => Math.abs(d[2])));
+  const c = chart("ch-heat");
+  c.getDom().style.height = Math.max(200, 70 + years.length * 38) + "px"; c.resize();
+  c.setOption({
+    ...B,
+    grid: { left: 8, right: 8, top: 8, bottom: 44, containLabel: true },
+    tooltip: { ...B.tooltip, trigger: "item", formatter: p => `<b>${E.MONTHS[p.value[0]]} ${years[p.value[1]]}</b>${p.value[3] ? " (parcial)" : ""}<br>Rentabilidad: <b>${pct(p.value[2] / 100, 2)}</b>` },
+    xAxis: { type: "category", data: E.MONTHS, axisLine: { show: false }, axisTick: { show: false }, axisLabel: { color: css("--muted"), fontSize: 11 }, splitArea: { show: false } },
+    yAxis: { type: "category", data: years.map(String), inverse: true, axisLine: { show: false }, axisTick: { show: false }, axisLabel: { color: css("--muted"), fontSize: 11 } },
+    visualMap: { min: -lim, max: lim, calculable: false, orient: "horizontal", left: "center", bottom: 0, itemHeight: 160, itemWidth: 10, text: [`+${nf(0).format(lim)} %`, `−${nf(0).format(lim)} %`],
+      textStyle: { color: css("--muted"), fontSize: 11 }, inRange: { color: [css("--neg"), css("--mid"), css("--pos")] }, dimension: 2 },
+    series: [{ type: "heatmap", data, itemStyle: { borderColor: css("--surface"), borderWidth: 2, borderRadius: 4 },
+      label: { show: true, fontSize: 10, color: css("--ink"), formatter: p => nf(1).format(p.value[2]) } }],
+  }, true);
+}
+
+function renderDD(ag, a, b) {
+  const B = base(), tl = R.tl, ka = Math.max(a - tl.d0, 0), kb = b - tl.d0;
+  const { dd, mdd } = E.maxDrawdown(ag, ka, kb);
+  const days = tsRange(a, b, (b - a) > 900 ? 2 : 1);
+  const neg = css("--neg");
+  chart("ch-dd").setOption({
+    ...B,
+    tooltip: { ...B.tooltip, formatter: ps => tipHead(ps[0].value[0]) + `<br>Caída: <b>${pct(ps[0].value[1] / 100, 2)}</b>` },
+    xAxis: { ...B.xAxis, type: "time", min: E.ts(a), max: E.ts(b), axisLabel: { ...B.xAxis.axisLabel, formatter: dateLabel, hideOverlap: true } },
+    yAxis: { ...B.yAxis, type: "value", max: 0, axisLabel: { ...B.yAxis.axisLabel, formatter: v => nf(0).format(v) + " %" } },
+    series: [{ type: "line", showSymbol: false, sampling: "lttb", lineStyle: { width: 1.5, color: neg }, itemStyle: { color: neg }, areaStyle: { color: neg, opacity: .14 },
+      data: days.map(d => [E.ts(d), dd[Math.max(d - tl.d0, ka) - ka] * 100]),
+      markPoint: { symbol: "circle", symbolSize: 8, itemStyle: { color: neg, borderColor: css("--surface"), borderWidth: 2 },
+        label: { show: true, position: "bottom", color: css("--ink-2"), fontSize: 11, formatter: () => "máx. " + pct(mdd) }, data: [{ type: "min" }] } }],
+  }, true);
+}
+
+// ---------- tablas ----------
+function renderPeriods(ag, a, b) {
+  const P = periodData(ag, a, b), T = E.period(R.tl, ag, a, b);
+  const cell = (v, cls = "") => `<td class="num ${cls}">${v}</td>`;
+  const row = x => `<tr><td>${esc(x.label)}<span class="sub">${E.fmt(x.a)} → ${E.fmt(x.b)}</span></td>${cell(eur.format(x.v0))}${cell(eur.format(x.flows))}${cell(eur.format(x.v1))}${cell(sgn(x.gain), x.gain >= 0 ? "pos-t" : "neg-t")}${cell(pct(x.twr, 2))}${cell(pct(x.dietz, 2))}</tr>`;
+  $("#tb-periods").innerHTML = `<thead><tr><th>Periodo</th><th>Valor inicial</th><th>Entradas netas</th><th>Valor final</th><th>Ganancia</th><th>TWR</th><th>Dietz</th></tr></thead>
+    <tbody>${P.map(row).join("")}</tbody>
+    <tfoot><tr><td>Total del rango</td>${cell(eur.format(T.v0))}${cell(eur.format(T.flows))}${cell(eur.format(T.v1))}${cell(sgn(T.gain), T.gain >= 0 ? "pos-t" : "neg-t")}${cell(pct(T.twr, 2))}${cell(pct(T.dietz, 2))}</tr></tfoot>`;
+  if (P.some(p => p.partial)) $("#tb-periods").insertAdjacentHTML("beforeend", `<caption style="caption-side:bottom;text-align:left;padding-top:8px" class="muted">* Periodo parcial: recortado por el rango o por las fechas con datos.</caption>`);
+  R.periodRows = P; R.periodTotal = T;
+}
+
+function renderFunds(a, b) {
+  const tl = R.tl, kb = b - tl.d0;
+  const rows = tl.isins.filter(i => !i.startsWith("__transito:") && ui.blocks.includes(tl.blockOf(i))).map(i => {
+    const ag = aggFund(i), p = E.period(tl, ag, a, b);
+    let u = 0; for (const o of R.fin) if (o.isin === i && o.exec <= b) u += o.sell ? -o.units : o.units;
+    if (Math.abs(u) < 0.0015) u = 0;
+    const q = R.nav.at(i, b);
+    return { i, p, u, nav: q.v, est: q.est };
+  }).filter(r => r.u > 0 || Math.abs(r.p.flows) > 0.01 || Math.abs(r.p.v0) > 0.01).sort((x, y) => y.p.v1 - x.p.v1 || y.p.v0 - x.p.v0);
+  const tot = rows.reduce((s, r) => ({ v1: s.v1 + r.p.v1, f: s.f + r.p.flows, g: s.g + r.p.gain }), { v1: 0, f: 0, g: 0 });
+  $("#tb-funds").innerHTML = `<thead><tr><th>Fondo</th><th class="l">Bloque</th><th>Participaciones</th><th>Valor liquidativo</th><th>Valor final</th><th>Peso</th><th>Entradas netas</th><th>Ganancia</th></tr></thead>
+  <tbody>${rows.map(r => `<tr><td>${esc(fundName(r.i))}<span class="sub">${esc(r.i)}</span></td><td class="l"><span class="tag" style="color:var(${BCOLOR[tl.blockOf(r.i)]})">● </span>${esc(tl.blockOf(r.i))}</td>
+    <td class="num">${r.u ? nf(3).format(r.u) : "—"}</td><td class="num">${r.u ? nf(3).format(r.nav) + (r.est ? " <span class='tag'>est.</span>" : "") : "—"}</td>
+    <td class="num">${eur.format(r.p.v1)}</td><td class="num">${tot.v1 > 0 ? nf(1).format(r.p.v1 / tot.v1 * 100) + " %" : "—"}</td>
+    <td class="num">${eur.format(r.p.flows)}</td><td class="num ${r.p.gain >= 0 ? "pos-t" : "neg-t"}">${sgn(r.p.gain)}</td></tr>`).join("")}</tbody>
+  <tfoot><tr><td>Total</td><td></td><td></td><td></td><td class="num">${eur.format(tot.v1)}</td><td class="num">100 %</td><td class="num">${eur.format(tot.f)}</td><td class="num">${sgn(tot.g)}</td></tr></tfoot>`;
+}
+
+function orderKind(o) {
+  if (o.state !== "Finalizada" || !o.units) return { k: "other", t: o.state || "—", cls: "off" };
+  if (o.internal) return o.sell ? { k: "int", t: "Traspaso (salida)", cls: "int" } : { k: "int", t: "Traspaso (entrada)", cls: "int" };
+  return o.sell ? { k: "sell", t: "Venta", cls: "sell" } : { k: "buy", t: "Compra", cls: "buy" };
+}
+function renderOrders(a, b) {
+  const q = ($("#q").value || "").toLowerCase(), ty = $("#otype").value;
+  const finByLine = new Map(R.fin.map(o => [o.line, o]));
+  const list = R.orders.map(o => finByLine.get(o.line) || o)
+    .filter(o => o.day > a - 1 && o.day <= b && (ui.blocks.includes(R.tl.blockOf(o.isin)) || !R.tl.isins.includes(o.isin)))
+    .filter(o => !q || (fundName(o.isin) + " " + o.isin).toLowerCase().includes(q))
+    .filter(o => !ty || orderKind(o).k === ty)
+    .sort((x, y) => y.day - x.day || x.line - y.line);
+  $("#orders-sub").textContent = `${list.length} órdenes en el rango. Las fechas de ejecución se deducen del valor liquidativo que cuadra con el importe.`;
+  $("#tb-orders").innerHTML = `<thead><tr><th>Fecha</th><th class="l">Fondo</th><th class="l">Tipo</th><th>Participaciones</th><th>Importe</th><th>Precio</th><th>Ejecución</th><th class="l">Ajuste</th></tr></thead>
+  <tbody>${list.map(o => { const k = orderKind(o); return `<tr><td class="num">${o.dateTxt}</td><td class="l">${esc(fundName(o.isin))}<span class="sub">${esc(o.isin)}</span></td>
+    <td class="l"><span class="tag ${k.cls}">${esc(k.t)}</span>${o.manual ? ` <span class="tag">manual</span>` : ""}${o.auto ? ` <span class="tag">deducida</span>` : ""}</td>
+    <td class="num">${o.units ? nf(3).format(o.units) : "—"}</td>
+    <td class="num">${o.flow != null ? eur.format(Math.abs(o.flow)) : (o.amount != null ? nf(2).format(o.amount) + " " + esc(o.cur) : "—")}</td>
+    <td class="num">${o.price ? nf(3).format(o.price) : "—"}</td>
+    <td class="num">${o.exec != null ? E.fmt(o.exec) + (o.execEst ? " <span class='tag'>est.</span>" : "") : "—"}</td>
+    <td class="l">${o.flow != null ? `<button class="btn small" type="button" data-flip="${esc(o.key)}" data-sell="${o.sell ? 1 : 0}">${o.sell ? "Es una compra" : "Es una venta"}</button>` : ""}</td></tr>`; }).join("")}</tbody>`;
+}
+
+// ---------- descargas ----------
+async function save(filename, text) {
+  if (!IN_CLAUDE) {
+    const url = URL.createObjectURL(new Blob(["\uFEFF" + text], { type: "text/csv;charset=utf-8" }));
+    const a = document.createElement("a"); a.href = url; a.download = filename; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 2000); return;
+  }
+  if (!downloads) return;
+  try { await downloads.save({ filename, data: "﻿" + text }); }
+  catch (e) { if (e && e.code !== "declined") toast("No se pudo descargar el archivo."); }
+}
+const csvNum = v => v == null ? "" : String(Math.round(v * 100) / 100).replace(".", ",");
+$("#dl-periods").onclick = () => {
+  const rows = [["Periodo", "Desde", "Hasta", "Valor inicial", "Entradas netas", "Valor final", "Ganancia", "TWR %", "Dietz %"]]
+    .concat(R.periodRows.map(x => [x.label, E.fmt(x.a), E.fmt(x.b), csvNum(x.v0), csvNum(x.flows), csvNum(x.v1), csvNum(x.gain), csvNum(x.twr * 100), csvNum(x.dietz == null ? null : x.dietz * 100)]));
+  save("ganancias-por-periodo.csv", rows.map(r => r.join(";")).join("\n"));
+};
+$("#dl-orders").onclick = () => {
+  const rows = [["Fecha orden", "ISIN", "Fondo", "Tipo", "Participaciones", "Importe EUR", "Precio", "Ejecucion", "Estado"]]
+    .concat(R.orders.map(o => { const f = R.fin.find(x => x.line === o.line) || o; return [o.dateTxt, o.isin, fundName(o.isin), orderKind(f).t, csvNum(o.units), csvNum(f.flow != null ? Math.abs(f.flow) : o.amount), f.price ? String(f.price).replace(".", ",") : "", f.exec != null ? E.fmt(f.exec) : "", o.state]; }));
+  save("ordenes-clasificadas.csv", rows.map(r => r.join(";")).join("\n"));
+};
+
+// ---------- subida de CSV ----------
+async function loadCsvText(text, name) {
+  let test;
+  try { test = E.run(text, NAV, OVERRIDES); }
+  catch (e) { toast("No se pudo leer el CSV: " + e.message); return; }
+  CSV = text; CSVNAME = name;
+  let where = "en este navegador";
+  if (db) {
+    try { await db.doc("panel/datos").set({ csv: text, name, uploadedAt: new Date().toISOString(), orders: test.orders.length }); CSVSOURCE = "db"; where = "en el panel"; store.del("panel-csv"); }
+    catch (e) { CSVSOURCE = "local"; store.set("panel-csv", { csv: text, name }); where = e && e.code === "quota_exceeded" ? "solo en este navegador (sin espacio en el panel)" : "solo en este navegador"; }
+  } else { CSVSOURCE = "local"; store.set("panel-csv", { csv: text, name }); }
+  ui.preset = "all";
+  show();
+  toast(`CSV cargado: ${test.orders.length} órdenes hasta ${E.fmt(Math.max(...test.orders.map(o => o.day)))}. Guardado ${where}.`);
+}
+function readFile(f) {
+  if (!f) return;
+  if (!/\.csv$/i.test(f.name) && f.type !== "text/csv") { toast("Sube el archivo .csv de órdenes que descargas de MyInvestor."); return; }
+  const r = new FileReader();
+  r.onload = () => loadCsvText(String(r.result), f.name);
+  r.onerror = () => toast("No se pudo abrir el archivo.");
+  r.readAsText(f, "utf-8");
+}
+$("#btn-upload").onclick = $("#btn-upload2").onclick = () => $("#file").click();
+$("#file").onchange = e => { readFile(e.target.files[0]); e.target.value = ""; };
+$("#btn-reset").onclick = async () => {
+  const b = $("#btn-reset");
+  const label = EMBEDDED ? "Volver al CSV original" : "Borrar mis datos de este navegador";
+  if (b.dataset.confirm !== "1") { b.dataset.confirm = "1"; b.textContent = "Pulsa otra vez para confirmar"; setTimeout(() => { b.dataset.confirm = ""; b.textContent = label; }, 4000); return; }
+  b.dataset.confirm = "";
+  store.del("panel-csv");
+  if (db) { try { await db.doc("panel/datos").delete(); } catch {} }
+  if (!EMBEDDED) { store.del("panel-overrides"); OVERRIDES = {}; }
+  CSV = EMBEDDED; CSVNAME = EMBEDDED ? "Órdenes 153906.csv" : ""; CSVSOURCE = "embedded";
+  show(); toast(EMBEDDED ? "Vuelves a ver el CSV original." : "Tus datos se han borrado de este navegador.");
+};
+let dragDepth = 0;
+addEventListener("dragenter", e => { if ([...(e.dataTransfer?.types || [])].includes("Files")) { dragDepth++; $("#drop").hidden = false; e.preventDefault(); } });
+addEventListener("dragover", e => { if ([...(e.dataTransfer?.types || [])].includes("Files")) e.preventDefault(); });
+addEventListener("dragleave", () => { dragDepth = Math.max(0, dragDepth - 1); if (!dragDepth) $("#drop").hidden = true; });
+addEventListener("drop", e => { e.preventDefault(); dragDepth = 0; $("#drop").hidden = true; readFile(e.dataTransfer?.files?.[0]); });
+
+// ---------- controles ----------
+document.querySelectorAll("#presets button").forEach(bt => bt.onclick = () => { ui.preset = bt.dataset.p; render(); });
+$("#from").onchange = e => { if (!e.target.value) return; ui.preset = "custom"; ui.from = e.target.value; ui.to = $("#to").value; render(); };
+$("#to").onchange = e => { if (!e.target.value) return; ui.preset = "custom"; ui.to = e.target.value; ui.from = $("#from").value; render(); };
+$("#group").onchange = e => { ui.group = e.target.value; render(); };
+document.querySelectorAll("#evo-mode button").forEach(bt => bt.onclick = () => { ui.evo = bt.dataset.m; render(); });
+document.querySelectorAll("#comp-mode button").forEach(bt => bt.onclick = () => { ui.comp = bt.dataset.m; render(); });
+$("#q").oninput = () => { const [a, b] = range(); renderOrders(a, b); };
+$("#otype").onchange = () => { const [a, b] = range(); renderOrders(a, b); };
+$("#tb-orders").addEventListener("click", async e => {
+  const bt = e.target.closest("[data-flip]"); if (!bt) return;
+  OVERRIDES = { ...OVERRIDES, [bt.dataset.flip]: bt.dataset.sell !== "1" };
+  store.set("panel-overrides", OVERRIDES);
+  if (db) { try { await db.doc("panel/ajustes").set({ overrides: OVERRIDES }); } catch {} }
+  compute(); render(); toast("Orden actualizada y recalculado.");
+});
+// tema: repintar gráficas cuando cambia
+const rerender = () => R && render();
+matchMedia("(prefers-color-scheme: dark)").addEventListener("change", rerender);
+new MutationObserver(rerender).observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] });
+
+// ECharts desde cdnjs; si no llega, se pide al CDN de respaldo antes de arrancar
+function ensureEcharts() {
+  if (window.echarts) return Promise.resolve();
+  return new Promise((ok, ko) => {
+    const s = document.createElement("script");
+    s.src = "https://cdn.jsdelivr.net/npm/echarts@5.5.0/dist/echarts.min.js";
+    s.onload = () => window.echarts ? ok() : ko(new Error("no se pudo cargar la librería de gráficas"));
+    s.onerror = () => ko(new Error("no se pudo cargar la librería de gráficas"));
+    document.head.appendChild(s);
+  });
+}
+ensureEcharts().then(boot).catch(e => { $("#notices").innerHTML = `<div class="notice"><span>⚠</span><span>No se pudieron cargar los datos del panel: ${esc(e.message)}. Recarga la página.</span></div>`; });
+})();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,135 @@
+{
+ "IE00BYX5NX33": {
+  "secid": "F00001019E",
+  "name": "Fidelity MSCI World",
+  "block": "Desarrollados",
+  "from": "2021-05-01",
+  "to": null
+ },
+ "LU0996175948": {
+  "secid": "F00000SCLB",
+  "name": "Amundi MSCI Emerging Markets",
+  "block": "Emergentes",
+  "from": "2021-05-01",
+  "to": null
+ },
+ "IE000ZYRH0Q7": {
+  "secid": "F00001SELX",
+  "name": "iShares Developed World",
+  "block": "Desarrollados",
+  "from": "2025-08-01",
+  "to": null
+ },
+ "IE000QAZP7L2": {
+  "secid": "F00001SELW",
+  "name": "iShares Emerging Markets",
+  "block": "Emergentes",
+  "from": "2025-08-01",
+  "to": null
+ },
+ "LU0080237943": {
+  "secid": "F0GBR04AW6",
+  "name": "DWS Euro Ultra Short (monetario)",
+  "block": "Monetario",
+  "from": "2024-12-01",
+  "to": "2025-05-01"
+ },
+ "IE00BYX5MX67": {
+  "secid": "F00001019G",
+  "name": "Fidelity S&P 500",
+  "block": "Cartera automatizada",
+  "from": "2021-05-25",
+  "to": "2022-02-15"
+ },
+ "IE00BYWYCC39": {
+  "secid": "F00000YZAJ",
+  "name": "iShares Emerging Markets (D)",
+  "block": "Cartera automatizada",
+  "from": "2021-05-25",
+  "to": "2022-02-15"
+ },
+ "IE0007471471": {
+  "secid": "F0GBR052E1",
+  "name": "Vanguard U.S. Govt Bond",
+  "block": "Cartera automatizada",
+  "from": "2021-05-25",
+  "to": "2022-02-15"
+ },
+ "IE00B246KL88": {
+  "secid": "F000001GFI",
+  "name": "Vanguard 20+ Yr Euro Treasury",
+  "block": "Cartera automatizada",
+  "from": "2021-05-25",
+  "to": "2022-02-15"
+ },
+ "IE00BYX5MD61": {
+  "secid": "F00000ZZMQ",
+  "name": "Fidelity MSCI Europe",
+  "block": "Cartera automatizada",
+  "from": "2021-05-25",
+  "to": "2022-02-15"
+ },
+ "IE00BYX5N771": {
+  "secid": "F00001019C",
+  "name": "Fidelity MSCI Japan",
+  "block": "Cartera automatizada",
+  "from": "2021-05-25",
+  "to": "2022-02-15"
+ },
+ "IE00B1G3DH73": {
+  "secid": "F0000000VM",
+  "name": "Vanguard U.S. 500 (cubierto)",
+  "block": "Cartera automatizada",
+  "from": "2021-05-25",
+  "to": "2022-02-15"
+ },
+ "IE00BDZVHT63": {
+  "secid": "F0000103YN",
+  "name": "Fidelity MSCI Pacific ex Japan",
+  "block": "Cartera automatizada",
+  "from": "2021-05-25",
+  "to": "2022-02-15"
+ },
+ "LU2349459045": {
+  "secid": "F00001D3FZ",
+  "name": "GS Global Enhanced Index Sust. Equity",
+  "block": "Cartera automatizada",
+  "from": "2021-05-25",
+  "to": "2022-02-15"
+ },
+ "IE00B5456744": {
+  "secid": "F00000LY5Q",
+  "name": "Vanguard ESG Developed World",
+  "block": "Cartera automatizada",
+  "from": "2021-05-25",
+  "to": "2022-02-15"
+ },
+ "IE00BDZS0987": {
+  "secid": "F00000ZL0B",
+  "name": "iShares US Index",
+  "block": "Cartera automatizada",
+  "from": "2021-05-25",
+  "to": "2022-02-15"
+ },
+ "IE0007987708": {
+  "secid": "F0GBR04SGM",
+  "name": "Vanguard European Stock",
+  "block": "Cartera automatizada",
+  "from": "2021-05-25",
+  "to": "2022-02-15"
+ },
+ "IE00BDRK7T12": {
+  "secid": "F00000Z2S3",
+  "name": "iShares Japan Index",
+  "block": "Cartera automatizada",
+  "from": "2021-05-25",
+  "to": "2022-02-15"
+ },
+ "IE00BDRK7R97": {
+  "secid": "F00000Z2S4",
+  "name": "iShares Pacific Index",
+  "block": "Cartera automatizada",
+  "from": "2021-05-25",
+  "to": "2022-02-15"
+ }
+}
