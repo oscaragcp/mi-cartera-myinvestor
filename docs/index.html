@@ -1,0 +1,453 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Documentación · Mi cartera indexada</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,650&family=Figtree:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: cabecera -> índice lateral fijo + contenido en una columna de lectura */
+:root {
+  --bg: #f3f4f6; --surface: #fcfcfb; --surface-2: #eceef1; --ink: #121417; --ink-2: #4b5059; --muted: #7d828b;
+  --grid: #e3e5e9; --border: rgba(18,20,23,.10); --accent: #2a78d6; --accent-ink: #1d5fae;
+  --s1: #2a78d6; --s2: #eb6834; --s3: #1baf7a; --s4: #eda100;
+  --warn-bg: #fff4d6; --warn-ink: #6b4a00;
+  --f-display: "Bricolage Grotesque", "Figtree", system-ui, sans-serif;
+  --f-body: "Figtree", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --f-mono: "JetBrains Mono", ui-monospace, Menlo, monospace;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0d0d0d; --surface: #1a1a19; --surface-2: #242423; --ink: #ffffff; --ink-2: #c3c2b7; --muted: #8f8d86;
+  --grid: #2c2c2a; --border: rgba(255,255,255,.10); --accent: #3987e5; --accent-ink: #7fb3f2;
+  --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500;
+  --warn-bg: #3a2e0c; --warn-ink: #ffd877; color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --bg: #0d0d0d; --surface: #1a1a19; --surface-2: #242423; --ink: #ffffff; --ink-2: #c3c2b7; --muted: #8f8d86;
+  --grid: #2c2c2a; --border: rgba(255,255,255,.10); --accent: #3987e5; --accent-ink: #7fb3f2;
+  --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500;
+  --warn-bg: #3a2e0c; --warn-ink: #ffd877; color-scheme: dark; }
+
+* { box-sizing: border-box; }
+html { scroll-padding-top: 16px; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.62 var(--f-body); }
+a { color: var(--accent-ink); text-underline-offset: 2px; }
+h1, h2, h3 { font-family: var(--f-display); letter-spacing: -.01em; text-wrap: balance; line-height: 1.2; }
+h1 { font-size: clamp(1.8rem, 1.3rem + 1.8vw, 2.6rem); font-weight: 650; margin: 0; }
+h2 { font-size: 1.45rem; font-weight: 650; margin: 2.6em 0 .5em; padding-top: .4em; border-top: 1px solid var(--grid); }
+h3 { font-size: 1.08rem; font-weight: 650; margin: 1.8em 0 .3em; }
+p, li { max-width: 72ch; }
+code, kbd { font-family: var(--f-mono); font-size: .86em; background: var(--surface-2); padding: .08em .35em; border-radius: 4px; }
+pre { font-family: var(--f-mono); font-size: .84rem; line-height: 1.55; background: var(--surface-2); border-radius: 10px; padding: 14px 16px; overflow-x: auto; max-width: 100%; }
+pre code { background: none; padding: 0; font-size: inherit; }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+.top { max-width: 1180px; margin: 0 auto; padding: 32px 20px 8px; display: flex; flex-wrap: wrap; gap: 12px 24px; align-items: end; justify-content: space-between; }
+.top p { margin: 6px 0 0; color: var(--ink-2); }
+.btn { display: inline-block; text-decoration: none; background: var(--ink); color: var(--bg); padding: 9px 16px; border-radius: 8px; font-weight: 600; font-size: .9rem; }
+.btn:hover { opacity: .88; }
+
+.layout { max-width: 1180px; margin: 0 auto; padding: 8px 20px 80px; display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: 40px; }
+nav.toc { position: sticky; top: 16px; align-self: start; max-height: calc(100vh - 32px); overflow: auto; font-size: .9rem; padding-top: 20px; }
+nav.toc ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+nav.toc a { display: block; color: var(--ink-2); text-decoration: none; padding: 4px 10px; border-radius: 6px; border-left: 2px solid transparent; }
+nav.toc a:hover { background: var(--surface-2); color: var(--ink); }
+nav.toc a.on { color: var(--ink); font-weight: 600; border-left-color: var(--accent); background: var(--surface); }
+nav.toc .lbl { font-size: .72rem; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); font-weight: 600; margin: 0 10px 8px; }
+main { min-width: 0; }
+main > section:first-child h2 { border-top: 0; margin-top: .6em; }
+
+.lead { font-size: 1.08rem; color: var(--ink-2); }
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin: 18px 0; }
+.card { background: var(--surface); border-radius: 10px; padding: 14px 16px; }
+.card b { display: block; font-family: var(--f-display); font-size: 1rem; margin-bottom: 2px; }
+.card span { color: var(--ink-2); font-size: .9rem; }
+.note { background: var(--surface); border-left: 3px solid var(--accent); border-radius: 0 10px 10px 0; padding: 10px 16px; margin: 16px 0; max-width: 76ch; }
+.note.warn { background: var(--warn-bg); color: var(--warn-ink); border-left-color: var(--s4); }
+.note p { margin: .3em 0; }
+.formula { font-family: var(--f-mono); font-size: .9rem; background: var(--surface); border-radius: 10px; padding: 12px 16px; margin: 12px 0; overflow-x: auto; max-width: 76ch; }
+
+.tbl { overflow-x: auto; margin: 14px 0; max-width: 100%; }
+table { border-collapse: collapse; font-size: .9rem; width: 100%; background: var(--surface); border-radius: 10px; overflow: hidden; }
+th, td { text-align: left; vertical-align: top; padding: 8px 12px; border-bottom: 1px solid var(--grid); }
+th { font-size: .74rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); font-weight: 600; background: var(--surface); }
+tr:last-child td { border-bottom: 0; }
+td:first-child { white-space: nowrap; font-weight: 600; }
+
+.steps { counter-reset: s; list-style: none; padding: 0; display: grid; gap: 10px; }
+.steps li { counter-increment: s; position: relative; padding-left: 40px; }
+.steps li::before { content: counter(s); position: absolute; left: 0; top: 0; width: 28px; height: 28px; border-radius: 50%; background: var(--ink); color: var(--bg); display: grid; place-items: center; font-weight: 700; font-size: .85rem; }
+
+.flow { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin: 18px 0; align-items: stretch; }
+.flow div { background: var(--surface); border-radius: 10px; padding: 12px 14px; font-size: .88rem; color: var(--ink-2); border-top: 3px solid var(--c, var(--accent)); }
+.flow b { display: block; color: var(--ink); font-size: .95rem; margin-bottom: 2px; }
+
+details.faq { background: var(--surface); border-radius: 10px; padding: 10px 16px; margin: 8px 0; max-width: 76ch; }
+details.faq summary { cursor: pointer; font-weight: 600; }
+details.faq p { margin: .5em 0 .2em; color: var(--ink-2); }
+
+@media (max-width: 860px) {
+  .layout { grid-template-columns: minmax(0, 1fr); gap: 0; padding-inline: 16px; }
+  .top { padding-inline: 16px; }
+  nav.toc { position: static; max-height: none; background: var(--surface); border-radius: 10px; padding: 12px 6px; margin-top: 12px; }
+  nav.toc ol { grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); }
+}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div>
+    <h1>Mi cartera indexada · Documentación</h1>
+    <p>Guía de uso, cálculos, datos y mantenimiento del panel.</p>
+  </div>
+  <a class="btn" href="../">Abrir el panel</a>
+</header>
+
+<div class="layout">
+  <nav class="toc" aria-label="Índice">
+    <div class="lbl">Contenido</div>
+    <ol>
+      <li><a href="#que-es">Qué es</a></li>
+      <li><a href="#inicio">Primeros pasos</a></li>
+      <li><a href="#csv">El CSV de órdenes</a></li>
+      <li><a href="#panel">Uso del panel</a></li>
+      <li><a href="#calculos">Cálculos</a></li>
+      <li><a href="#ordenes">Cómo interpreta las órdenes</a></li>
+      <li><a href="#vl">Valores liquidativos</a></li>
+      <li><a href="#privacidad">Privacidad y almacenamiento</a></li>
+      <li><a href="#tecnica">Arquitectura</a></li>
+      <li><a href="#mantenimiento">Mantenimiento</a></li>
+      <li><a href="#limites">Limitaciones</a></li>
+      <li><a href="#faq">Preguntas frecuentes</a></li>
+      <li><a href="#cambios">Historial de cambios</a></li>
+    </ol>
+  </nav>
+
+  <main>
+    <section id="que-es">
+      <h2>Qué es</h2>
+      <p class="lead">Un panel web para analizar una cartera de fondos de MyInvestor a partir del CSV de órdenes que se descarga desde la web del banco. Calcula cuánto has ganado en cada periodo, cuánto has aportado, cómo ha evolucionado el valor y qué rentabilidad has obtenido, separando siempre lo aportado de lo ganado.</p>
+      <div class="cards">
+        <div class="card"><b>Sin servidor</b><span>Una página HTML con JavaScript. Todo se calcula en tu navegador.</span></div>
+        <div class="card"><b>Privado</b><span>Tu CSV no se sube a ningún sitio; se guarda solo en tu navegador.</span></div>
+        <div class="card"><b>Precios diarios</b><span>Valores liquidativos oficiales de cada fondo, actualizados cada día laborable.</span></div>
+        <div class="card"><b>Por año de cuenta</b><span>Agrupa por años del 31/05 al 31/05, años naturales, trimestres o meses.</span></div>
+      </div>
+      <p>Dirección del panel: <a href="../">oscaragcp.github.io/mi-cartera-myinvestor</a>. Código fuente: <a href="https://github.com/oscaragcp/mi-cartera-myinvestor">github.com/oscaragcp/mi-cartera-myinvestor</a>.</p>
+    </section>
+
+    <section id="inicio">
+      <h2>Primeros pasos</h2>
+      <ol class="steps">
+        <li>Entra en la web de MyInvestor <b>desde un ordenador</b> (la app no permite exportar).</li>
+        <li>Abre la consulta de órdenes u operaciones de fondos y elige el rango de fechas <b>desde tu primera orden hasta hoy</b>. Si dejas fuera órdenes antiguas, el panel no sabrá qué participaciones tenías y las cifras saldrán mal.</li>
+        <li>Descarga el archivo <code>.csv</code> (se llama «Órdenes NNNN.csv»).</li>
+        <li>Abre el panel y pulsa <b>Subir CSV actualizado</b>, o arrastra el archivo sobre la página.</li>
+        <li>Listo: el panel se recalcula al momento y recuerda el archivo la próxima vez que lo abras en ese navegador.</li>
+      </ol>
+      <p>Para actualizarlo más adelante, descarga un CSV nuevo (otra vez desde la primera orden) y súbelo: sustituye al anterior.</p>
+    </section>
+
+    <section id="csv">
+      <h2>El CSV de órdenes</h2>
+      <p>El panel lee el archivo tal como lo genera MyInvestor: texto separado por punto y coma (<code>;</code>), una orden por línea y una primera línea de cabecera. Reconoce las columnas por su nombre, sin importar el orden ni las mayúsculas:</p>
+      <div class="tbl"><table>
+        <thead><tr><th>Columna</th><th>Se reconoce si…</th><th>Uso</th></tr></thead>
+        <tbody>
+          <tr><td>Fecha de la orden</td><td>empieza por «fecha»</td><td>Día en que diste la orden, formato <code>dd/mm/aaaa</code>.</td></tr>
+          <tr><td>ISIN</td><td>es exactamente «isin»</td><td>Identifica el fondo.</td></tr>
+          <tr><td>Importe estimado</td><td>empieza por «importe»</td><td>Importe y moneda, p. ej. <code>150.00 EUR</code>. En compras es el dinero aportado.</td></tr>
+          <tr><td>Nº de participaciones</td><td>contiene «participaciones»</td><td>Participaciones compradas o vendidas.</td></tr>
+          <tr><td>Estado</td><td>empieza por «estado»</td><td>Solo cuentan las órdenes <code>Finalizada</code> con participaciones.</td></tr>
+        </tbody>
+      </table></div>
+      <ul>
+        <li>Números: acepta coma o punto decimal (<code>12,5</code> o <code>12.5</code>). Si un número lleva punto, sus comas se toman como separador de miles (<code>1,234.56</code>).</li>
+        <li>Las líneas sin fecha válida se ignoran y el panel avisa de cuáles son.</li>
+        <li>Las órdenes canceladas, rechazadas o pendientes aparecen en la tabla de órdenes como «No ejecutadas», pero no afectan a los cálculos.</li>
+      </ul>
+      <div class="note warn"><p><b>El CSV no dice si una orden es compra o venta.</b> Todas las filas tienen importe y participaciones positivos. El panel lo deduce (ver <a href="#ordenes">Cómo interpreta las órdenes</a>) y te deja corregirlo.</p></div>
+    </section>
+
+    <section id="panel">
+      <h2>Uso del panel</h2>
+
+      <h3>Cabecera</h3>
+      <p>Muestra el archivo cargado y dónde está guardado, cuántas órdenes se han ejecutado, la fecha de la última orden y hasta qué día hay <b>valores liquidativos exactos</b>. Esa fecha es la más antigua entre los fondos que tienes hoy. Si aparece en amarillo, hay días cuyo valor se ha estimado.</p>
+      <p>Debajo pueden salir avisos: valores estimados, órdenes tomadas como venta automáticamente, participaciones negativas (señal de una compra/venta mal deducida) o líneas del CSV ignoradas.</p>
+
+      <h3>Filtros</h3>
+      <p>Se aplican a todo el panel y se recuerdan entre visitas.</p>
+      <div class="tbl"><table>
+        <thead><tr><th>Filtro</th><th>Qué hace</th></tr></thead>
+        <tbody>
+          <tr><td>Rango</td><td><b>Todo</b>, <b>Año de cuenta actual</b> (desde el último 31/05), <b>Este año</b>, <b>12 meses</b> y <b>3 años</b>, o fechas a mano en <i>Desde</i> y <i>Hasta</i>. El rango llega siempre <b>hasta hoy</b>, aunque no haya órdenes recientes.</td></tr>
+          <tr><td>Fondos</td><td>Activa o desactiva bloques: Desarrollados, Emergentes, Monetario y Cartera automatizada (los fondos de una cartera gestionada). Debe quedar al menos uno.</td></tr>
+          <tr><td>Agrupar por</td><td>Cómo se cortan los periodos en gráficas y tablas: año de cuenta (31/05 → 31/05), año natural, trimestre o mes. Un periodo recortado por el rango se marca con <code>*</code>.</td></tr>
+        </tbody>
+      </table></div>
+
+      <h3>Cifras clave</h3>
+      <div class="tbl"><table>
+        <thead><tr><th>Cifra</th><th>Significado</th></tr></thead>
+        <tbody>
+          <tr><td>Ganancia en el rango</td><td>Valor final − valor inicial − entradas netas.</td></tr>
+          <tr><td>Valor final</td><td>Valor de los fondos el último día del rango (y el valor inicial, si no se parte de cero).</td></tr>
+          <tr><td>Entradas netas</td><td>Compras − ventas dentro del rango.</td></tr>
+          <tr><td>Rentabilidad (TWR)</td><td>Rentabilidad ponderada por tiempo; anualizada si el rango dura al menos un año.</td></tr>
+          <tr><td>TIR anual</td><td>Tasa interna de rentabilidad de tu dinero según cuándo entró. Se muestra con rangos de 6 meses o más.</td></tr>
+          <tr><td>Máxima caída</td><td>Mayor caída del índice de rentabilidad desde un máximo previo, dentro del rango.</td></tr>
+        </tbody>
+      </table></div>
+
+      <h3>Gráficas</h3>
+      <div class="tbl"><table>
+        <thead><tr><th>Gráfica</th><th>Qué muestra</th></tr></thead>
+        <tbody>
+          <tr><td>Evolución</td><td>Tres vistas: <b>Valor y aportado</b> (valor de la cartera frente a dinero aportado; el hueco es la ganancia), <b>Ganancia acumulada</b> (azul por encima de 0, rojo por debajo) y <b>Rentabilidad (base 100)</b> (cómo habrían crecido 100 € sin efecto de las aportaciones). Líneas verticales en cada 31/05 y zona «estimado» cuando no hay precios oficiales.</td></tr>
+          <tr><td>Ganancia por periodo</td><td>Barras por periodo. <b>Pulsa una barra</b> para filtrar el panel a ese periodo.</td></tr>
+          <tr><td>De lo aportado al valor final</td><td>Cascada: valor inicial + entradas netas + ganancia de cada periodo = valor final.</td></tr>
+          <tr><td>Entradas netas por periodo</td><td>Compras − ventas apiladas por bloque. En un traspaso, sale de un bloque y entra en otro.</td></tr>
+          <tr><td>Composición</td><td>Valor de cada bloque en el tiempo, en euros o en porcentaje.</td></tr>
+          <tr><td>Rentabilidad mensual</td><td>Mapa de calor con el TWR de cada mes.</td></tr>
+          <tr><td>Caída desde máximos</td><td>Distancia del índice de rentabilidad a su último máximo, con la peor caída marcada.</td></tr>
+        </tbody>
+      </table></div>
+
+      <h3>Tablas</h3>
+      <ul>
+        <li><b>Detalle por periodo</b>: valor inicial, entradas netas, valor final, ganancia, TWR y Dietz de cada periodo, con el total del rango.</li>
+        <li><b>Fondos</b>: participaciones, valor liquidativo, valor final, peso, entradas netas y ganancia de cada fondo en el rango.</li>
+        <li><b>Órdenes</b>: todas las órdenes del CSV con su tipo deducido (compra, venta, traspaso de entrada o salida, no ejecutada), importe, precio y fecha de ejecución. Se puede buscar por fondo o ISIN y filtrar por tipo. El botón <b>Es una compra / Es una venta</b> corrige la deducción; la corrección se guarda.</li>
+      </ul>
+
+      <h3>Descargas</h3>
+      <p>Las tablas de periodos y de órdenes se pueden descargar como CSV (separado por <code>;</code>, coma decimal, listo para Excel): <code>ganancias-por-periodo.csv</code> y <code>ordenes-clasificadas.csv</code>.</p>
+
+      <h3>Tema</h3>
+      <p>El panel y esta documentación siguen el modo claro u oscuro de tu sistema.</p>
+    </section>
+
+    <section id="calculos">
+      <h2>Cálculos</h2>
+      <p>El panel construye una serie diaria desde la primera orden hasta hoy con el valor de cada fondo (participaciones × valor liquidativo) y el dinero que entra o sale cada día. Todo lo demás sale de ahí.</p>
+
+      <h3>Ganancia</h3>
+      <div class="formula">ganancia = valor final − valor inicial − (compras − ventas)</div>
+      <p>Lo que aportas no cuenta como ganancia y lo que retiras no cuenta como pérdida. La suma de las ganancias de los periodos es la ganancia del rango.</p>
+
+      <h3>Rentabilidad ponderada por tiempo (TWR)</h3>
+      <p>Mide cómo lo han hecho los fondos, independientemente de cuándo y cuánto aportaste. Se encadena la rentabilidad de cada día:</p>
+      <div class="formula">r(día) = (V(día) − V(día anterior) − F(día)) / (V(día anterior) + max(0, F(día)))<br>índice(día) = índice(día anterior) × (1 + r(día))</div>
+      <p>donde <i>V</i> es el valor de la cartera y <i>F</i> la entrada neta de ese día. Las compras se suponen invertidas desde el principio del día. Si la cartera vale menos de 1 €, la rentabilidad del día es 0. El TWR de un periodo es índice final / índice inicial − 1. Si el rango dura un año o más, se anualiza: (1 + TWR)<sup>1/años</sup> − 1.</p>
+
+      <h3>Dietz modificado</h3>
+      <p>Rentabilidad sobre el capital medio invertido en el periodo: cada aportación pesa según la parte del periodo que estuvo invertida.</p>
+      <div class="formula">Dietz = ganancia / (valor inicial + Σ F(día) × días restantes / días del periodo)</div>
+
+      <h3>TIR (rentabilidad del dinero)</h3>
+      <p>La tasa anual que hace que el valor actual de tus flujos sea cero: el valor inicial y cada compra como salidas de dinero, cada venta como entrada y el valor final como cobro al final del rango. Se resuelve por bisección entre −95 % y +500 % anual. Si no hay solución en ese intervalo o el rango dura menos de 6 meses, se muestra «—».</p>
+      <div class="note"><p><b>¿TWR o TIR?</b> El TWR juzga a los fondos y la TIR juzga tu dinero. Si aportaste mucho justo antes de una subida, tu TIR será mayor que el TWR, y al revés.</p></div>
+
+      <h3>Máxima caída y rentabilidad mensual</h3>
+      <p>La caída desde máximos es índice / máximo anterior del índice − 1, calculada dentro del rango. La rentabilidad mensual es el TWR de cada mes natural.</p>
+    </section>
+
+    <section id="ordenes">
+      <h2>Cómo interpreta las órdenes</h2>
+      <div class="flow">
+        <div style="--c:var(--s1)"><b>1. Leer</b>Órdenes finalizadas con participaciones, por fecha.</div>
+        <div style="--c:var(--s2)"><b>2. Compra o venta</b>Ventas conocidas, ventas que vacían un fondo y correcciones manuales.</div>
+        <div style="--c:var(--s3)"><b>3. Traspasos</b>Ventas emparejadas con compras de los días siguientes.</div>
+        <div style="--c:var(--s4)"><b>4. Fecha y precio</b>El día cuyo valor liquidativo cuadra con el importe.</div>
+        <div style="--c:var(--accent)"><b>5. Serie diaria</b>Valor y entradas de cada fondo, día a día.</div>
+      </div>
+
+      <h3>Compra o venta</h3>
+      <p>Por orden de prioridad:</p>
+      <ol>
+        <li><b>Corrección manual</b> hecha con el botón de la tabla de órdenes.</li>
+        <li><b>Ventas ya identificadas</b> hasta el 05/10/2026, guardadas en el código como huellas anónimas (ver <a href="#privacidad">Privacidad</a>).</li>
+        <li><b>Detección automática</b> para órdenes posteriores al 05/10/2026: se toma como venta una orden de más de 500 € cuyas participaciones coinciden (±0,2 %) con todas las que tenías de ese fondo. Es decir, una orden que <b>vacía el fondo</b>. El panel avisa cuando aplica esta regla.</li>
+        <li>Si no, es una <b>compra</b>.</li>
+      </ol>
+      <p>Una venta parcial nueva no se puede deducir: corrígela con el botón. Si las participaciones de un fondo quedan negativas, el panel avisa, porque seguramente hay una venta tomada como compra.</p>
+
+      <h3>Traspasos</h3>
+      <p>MyInvestor ejecuta un traspaso como una venta seguida de compras. El panel agrupa las ventas separadas por 3 días o menos y busca compras de <b>otros fondos</b> en los 10 días siguientes cuya suma coincida con lo vendido (±6 %). Si las encuentra:</p>
+      <ul>
+        <li>Las marca como <i>Traspaso (salida)</i> y <i>Traspaso (entrada)</i>.</li>
+        <li>Busca la fecha de ejecución común de las ventas: el día, entre 0 y 10 después, en que lo vendido vale lo mismo que lo comprado.</li>
+        <li>Mientras el dinero está «en tránsito» entre la venta y la compra, lo cuenta como liquidez del bloque de destino, para que el valor de la cartera no caiga a cero esos días.</li>
+      </ul>
+
+      <h3>Fecha de ejecución y precio</h3>
+      <ul>
+        <li><b>Compras en euros</b>: de los días 0 a 10 posteriores a la orden, el que tenga un valor liquidativo con el que participaciones × precio se acerque más al importe.</li>
+        <li><b>Compras en otra moneda</b>: el primer valor liquidativo posterior al día de la orden; el importe en euros es participaciones × precio.</li>
+        <li><b>Ventas</b>: el primer valor liquidativo posterior al día de la orden (o la fecha común del traspaso). El importe de una venta es participaciones × precio, porque el «importe estimado» del CSV no es el cobrado. Si se conoce el importe real de un reembolso, se usa ese.</li>
+        <li>Si no hay precios oficiales para esas fechas, la ejecución se supone 2 días después de la orden y se marca como <i>est.</i></li>
+      </ul>
+    </section>
+
+    <section id="vl">
+      <h2>Valores liquidativos</h2>
+      <p>El archivo <code>data/navs.json</code> contiene el valor liquidativo diario en euros de cada fondo de <code>data/funds.json</code>, obtenido de Morningstar. Lo regenera la acción de GitHub <b>Actualizar valores liquidativos</b>, que se ejecuta de martes a sábado a las 06:30 UTC (con los precios del día laborable anterior) y también se puede lanzar a mano desde la pestaña <i>Actions</i>. Si falla la descarga de un fondo, se conserva su histórico anterior.</p>
+      <p>Los fondos publican su valor liquidativo con 1 a 3 días de retraso. Para los días sin precio oficial:</p>
+      <ul>
+        <li>Si el CSV tiene órdenes posteriores al último precio, el valor se estima interpolando con el precio implícito de esas órdenes (importe / participaciones).</li>
+        <li>Si no, se mantiene el último precio conocido hasta hoy.</li>
+        <li>Esos días se sombrean como «estimado» en las gráficas. El aviso de la cabecera solo sale si hay órdenes sin precio oficial o si el último precio tiene más de 4 días.</li>
+      </ul>
+      <p>Un fondo que no esté en <code>data/funds.json</code> se valora solo con los precios de tus órdenes y aparece como «sin histórico» en los avisos. Para añadirlo, consulta <a href="#mantenimiento">Mantenimiento</a>.</p>
+    </section>
+
+    <section id="privacidad">
+      <h2>Privacidad y almacenamiento</h2>
+      <ul>
+        <li>El CSV se lee con JavaScript en tu navegador. <b>No se envía a ningún servidor</b>: la página solo descarga sus propios archivos, la librería de gráficas y las fuentes.</li>
+        <li>Se guarda en el <code>localStorage</code> de tu navegador, solo para esta dirección:
+          <div class="tbl"><table>
+            <thead><tr><th>Clave</th><th>Contenido</th></tr></thead>
+            <tbody>
+              <tr><td><code>panel-csv</code></td><td>Texto y nombre del último CSV subido.</td></tr>
+              <tr><td><code>panel-overrides</code></td><td>Correcciones manuales de compra/venta.</td></tr>
+              <tr><td><code>panel-ui</code></td><td>Filtros y vistas elegidos.</td></tr>
+            </tbody>
+          </table></div>
+        </li>
+        <li>El botón <b>Borrar mis datos de este navegador</b> elimina el CSV y las correcciones. Abrir el panel en modo privado o desde otro dispositivo empieza sin datos.</li>
+        <li>El repositorio es público y <b>no contiene datos personales</b>: <code>.gitignore</code> excluye cualquier <code>*.csv</code>. Las ventas ya identificadas se guardan como <b>huellas</b> (hash cyrb53 en base 36 de <code>ISIN|dd/mm/aaaa|participaciones</code>), que permiten reconocer una orden concreta sin publicar su fecha, fondo ni importe.</li>
+        <li>Sí son públicos la lista de fondos de <code>data/funds.json</code> y sus valores liquidativos.</li>
+      </ul>
+    </section>
+
+    <section id="tecnica">
+      <h2>Arquitectura</h2>
+      <p>HTML, CSS y JavaScript sin compilación ni dependencias instaladas. Las gráficas usan <a href="https://echarts.apache.org/">Apache ECharts 5.5.0</a> desde cdnjs, con jsDelivr de respaldo, y las fuentes Figtree y Bricolage Grotesque de Google Fonts.</p>
+      <div class="tbl"><table>
+        <thead><tr><th>Archivo</th><th>Función</th></tr></thead>
+        <tbody>
+          <tr><td><code>index.html</code></td><td>El panel completo: estilos, motor de cálculo e interfaz en un solo archivo.</td></tr>
+          <tr><td><code>data/funds.json</code></td><td>Fondos conocidos: ISIN → SecId de Morningstar, nombre, bloque y fechas de descarga (<code>from</code>, <code>to</code>; <code>to: null</code> = hasta hoy).</td></tr>
+          <tr><td><code>data/navs.json</code></td><td>Valores liquidativos diarios. Formato: <code>{epoch, generated, funds: {ISIN: {name, block, secid, nav: [[día, valor], …]}}}</code>, con <i>día</i> = días desde el 01/01/2021.</td></tr>
+          <tr><td><code>scripts/update_navs.py</code></td><td>Descarga los valores liquidativos y reescribe <code>navs.json</code> (Python estándar, sin dependencias).</td></tr>
+          <tr><td><code>.github/workflows/update-navs.yml</code></td><td>Ejecuta el script cada día laborable y hace commit si hay cambios.</td></tr>
+          <tr><td><code>docs/index.html</code></td><td>Esta documentación.</td></tr>
+          <tr><td><code>.nojekyll</code></td><td>Hace que GitHub Pages sirva los archivos tal cual.</td></tr>
+        </tbody>
+      </table></div>
+
+      <h3>Motor de cálculo</h3>
+      <p>El objeto <code>Engine</code> (dentro de <code>index.html</code>) son funciones puras, sin acceso a la página, que trabajan con días enteros desde el 01/01/2021 (UTC):</p>
+      <div class="tbl"><table>
+        <thead><tr><th>Función</th><th>Qué hace</th></tr></thead>
+        <tbody>
+          <tr><td><code>run(csv, navs, ajustes, hoy)</code></td><td>Proceso completo: lee el CSV, construye los precios, clasifica, ejecuta y genera la serie diaria hasta <code>hoy</code>.</td></tr>
+          <tr><td><code>parseCSV</code></td><td>Lee y valida el CSV.</td></tr>
+          <tr><td><code>buildNav</code></td><td>Precio de un fondo en cualquier día (oficial o estimado).</td></tr>
+          <tr><td><code>classify</code></td><td>Compra o venta de cada orden.</td></tr>
+          <tr><td><code>execute</code></td><td>Traspasos, fecha de ejecución, precio y flujo de cada orden.</td></tr>
+          <tr><td><code>timeline</code></td><td>Valor y flujos diarios por fondo, incluido el dinero en tránsito.</td></tr>
+          <tr><td><code>aggregate</code></td><td>Suma un conjunto de fondos y calcula el índice TWR.</td></tr>
+          <tr><td><code>period</code>, <code>periods</code></td><td>Cifras de un periodo y cortes por año de cuenta, año, trimestre o mes.</td></tr>
+          <tr><td><code>xirr</code>, <code>maxDrawdown</code></td><td>TIR y caída desde máximos.</td></tr>
+        </tbody>
+      </table></div>
+      <p>La interfaz llama a <code>run</code> al cargar o subir un CSV y recalcula el resto en cada cambio de filtro, con una caché por combinación de bloques.</p>
+    </section>
+
+    <section id="mantenimiento">
+      <h2>Mantenimiento</h2>
+
+      <h3>Añadir un fondo nuevo</h3>
+      <ol>
+        <li>Busca el fondo en Morningstar España y copia su <b>SecId</b> (el identificador de 10 caracteres de la URL, p. ej. <code>F00000XXXX</code>).</li>
+        <li>Añádelo a <code>data/funds.json</code>:
+<pre><code>"IE00XXXXXXXX": {
+  "secid": "F00000XXXX",
+  "name": "Nombre corto del fondo",
+  "block": "Desarrollados",
+  "from": "2021-05-01",
+  "to": null
+}</code></pre>
+          <code>block</code> debe ser uno de: Desarrollados, Emergentes, Monetario o Cartera automatizada. Cualquier otro valor se agrupa como «Otros».</li>
+        <li>Haz commit y push, y lanza la acción <i>Actualizar valores liquidativos</i> desde la pestaña <i>Actions</i> (o espera a la siguiente ejecución programada).</li>
+      </ol>
+
+      <h3>Registrar una venta parcial</h3>
+      <p>Lo más sencillo es corregirla con el botón de la tabla de órdenes, pero esa corrección solo vive en tu navegador. Para fijarla en el código, calcula su huella y añádela a <code>KNOWN_SELLS</code> en <code>index.html</code>. La función <code>fp</code> es interna al motor: copia su definición (busca <code>const fp =</code>) en la consola del navegador y ejecútala con la clave de la orden:</p>
+<pre><code>fp("IE00XXXXXXXX|15/11/2026|12.345")   // ISIN|fecha de la orden|participaciones tal como salen en el CSV</code></pre>
+<p>Si además conoces el importe real cobrado, añádelo a <code>KNOWN_SALE_VALUE</code> con la misma huella.</p>
+
+      <h3>Cambiar el panel</h3>
+      <ol>
+        <li>Edita <code>index.html</code>. (Las fuentes originales del autor separan el motor, <code>engine.js</code>, de la página, <code>index.src.html</code>, y se combinan para generar <code>index.html</code>. Si las usas, edítalas a ellas y regenera.)</li>
+        <li>Prueba en local: <code>python3 -m http.server</code> en la carpeta del repositorio y abre <code>http://localhost:8000</code>. El motor exporta <code>module.exports</code>, así que también se puede probar con Node: <code>const E = require("./engine.js"); E.run(csv, navs, {}, E.dayOf(2026, 10, 7))</code>.</li>
+        <li>Revisa también las vistas que no se ven al cargar (por ejemplo, las tres de la gráfica de evolución) y la consola del navegador.</li>
+        <li><code>git pull</code> (la acción hace commits a diario), commit y push. GitHub Pages publica en un minuto.</li>
+      </ol>
+      <div class="note warn"><p><b>Lecciones aprendidas.</b> Comprueba que una versión existe en el CDN antes de usarla (ECharts 5.5.1 no está en cdnjs). En ECharts 5.5, un <code>visualMap</code> en una serie de línea rompe el dibujado (<code>reading 'coord'</code>); para colorear por signo, usa un degradado con corte en 0. Los elementos con <code>hidden</code> y su propio <code>display</code> necesitan la regla <code>[hidden]{display:none}</code>.</p></div>
+    </section>
+
+    <section id="limites">
+      <h2>Limitaciones</h2>
+      <ul>
+        <li>Solo fondos de inversión del CSV de órdenes. No incluye acciones, ETF, cuentas ni depósitos.</li>
+        <li>No descuenta comisiones cobradas fuera de los fondos (custodia, gestión de carteras automatizadas cobrada en cuenta) ni impuestos. Los gastos internos de cada fondo ya están en su valor liquidativo.</li>
+        <li>Las ventas parciales posteriores al 05/10/2026 hay que marcarlas a mano.</li>
+        <li>Fechas de ejecución y precios de venta deducidos: pueden diferir en céntimos de los de tus extractos.</li>
+        <li>Órdenes en otras monedas: se valoran con el precio en euros del fondo, no con el tipo de cambio de la orden.</li>
+        <li>Los últimos días se valoran con el último precio publicado hasta que llega el oficial.</li>
+      </ul>
+    </section>
+
+    <section id="faq">
+      <h2>Preguntas frecuentes</h2>
+      <details class="faq"><summary>¿Por qué mi ganancia no coincide con la de la app de MyInvestor?</summary>
+        <p>MyInvestor suele mostrar la plusvalía de las posiciones actuales sobre su coste, sin contar lo ya vendido ni lo traspasado. El panel cuenta todo lo ganado desde la primera orden, incluidos fondos que ya no tienes.</p></details>
+      <details class="faq"><summary>Una venta aparece como compra (o al revés).</summary>
+        <p>Búscala en la tabla de órdenes y pulsa «Es una venta» o «Es una compra». Se recalcula todo al momento y la corrección se guarda en tu navegador.</p></details>
+      <details class="faq"><summary>Aparece «participaciones negativas».</summary>
+        <p>Alguna venta se ha tomado como compra antes de ella, o el CSV no empieza en tu primera orden. Revisa las órdenes de ese fondo o descarga el CSV desde el principio.</p></details>
+      <details class="faq"><summary>La zona «estimado» aparece al final de las gráficas.</summary>
+        <p>Los valores liquidativos oficiales tardan 1 a 3 días en publicarse. Hasta entonces se usa el último disponible. Se corrige solo cuando la acción diaria trae los nuevos precios.</p></details>
+      <details class="faq"><summary>¿Puedo ver mis datos en otro dispositivo?</summary>
+        <p>Sí, pero tienes que subir el CSV también allí: cada navegador guarda su propia copia y nada se sincroniza.</p></details>
+      <details class="faq"><summary>¿Por qué el TWR y la TIR son tan distintos?</summary>
+        <p>El TWR ignora cuándo entró el dinero y la TIR no. Si una gran aportación coincidió con una subida o una caída, las dos cifras se separan. Ver <a href="#calculos">Cálculos</a>.</p></details>
+    </section>
+
+    <section id="cambios">
+      <h2>Historial de cambios</h2>
+      <div class="tbl"><table>
+        <thead><tr><th>Fecha</th><th>Cambio</th></tr></thead>
+        <tbody>
+          <tr><td>07/10/2026</td><td>Documentación publicada en <code>/docs/</code>.</td></tr>
+          <tr><td>07/10/2026</td><td>El rango de fechas llega siempre hasta hoy; los días sin precio oficial mantienen el último valor. La fecha de «valores liquidativos exactos» se calcula con los fondos que tienes hoy. Avisos solo cuando los precios llevan más de 4 días sin actualizarse.</td></tr>
+          <tr><td>07/10/2026</td><td>Arreglada la vista «Ganancia acumulada», que se mostraba vacía.</td></tr>
+          <tr><td>06/10/2026</td><td>Primera versión pública en GitHub Pages, sin datos personales y con actualización diaria de valores liquidativos.</td></tr>
+        </tbody>
+      </table></div>
+    </section>
+  </main>
+</div>
+
+<script>
+// Resalta en el índice la sección visible
+(() => {
+  const links = new Map([...document.querySelectorAll("nav.toc a")].map(a => [a.getAttribute("href").slice(1), a]));
+  const io = new IntersectionObserver(es => es.forEach(e => {
+    if (!e.isIntersecting) return;
+    links.forEach(a => a.classList.remove("on"));
+    links.get(e.target.id)?.classList.add("on");
+  }), { rootMargin: "-10% 0px -80% 0px" });
+  document.querySelectorAll("main > section").forEach(s => io.observe(s));
+})();
+</script>
+</body>
+</html>
