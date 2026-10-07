@@ -460,7 +460,7 @@ const Engine = (() => {
     return fin;
   }
 
-  function timeline(fin, nav, blockOf0) {
+  function timeline(fin, nav, blockOf0, today) {
     // Dinero en tránsito durante un traspaso: se guarda como liquidez del bloque destino
     // para que el valor no caiga a cero entre la venta y la compra.
     const transit = [];
@@ -486,7 +486,8 @@ const Engine = (() => {
     const blockOf = i => i.startsWith("__transito:") ? i.slice(11) : blockOf0(i);
     const isins = [...new Set(fin.map(o => o.isin).concat(transit.map(t => t.id)))];
     const d0 = Math.min(...fin.map(o => o.exec)) - 1;
-    const end = Math.max(nav.lastReal, ...fin.map(o => o.exec));
+    // hasta hoy aunque no haya órdenes: después del último VL se mantiene el último conocido (estimado)
+    const end = Math.max(nav.lastReal, ...fin.map(o => o.exec), today ?? -Infinity);
     const n = end - d0 + 1;
     const V = {}, F = {}, U = {};
     isins.forEach(i => { V[i] = new Float64Array(n); F[i] = new Float64Array(n); });
@@ -585,14 +586,14 @@ const Engine = (() => {
   }
   const MONTHS = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"];
 
-  function run(csvText, navData, overrides) {
+  function run(csvText, navData, overrides, today) {
     const { orders, bad } = parseCSV(csvText);
     const nav = buildNav(navData, orders);
     const { fin, holdings, warnings } = classify(orders, overrides);
     if (!fin.length) throw new Error("El CSV no tiene órdenes finalizadas.");
     execute(fin, nav);
     const blockOf = i => (navData.funds[i] && navData.funds[i].block) || "Otros";
-    const tl = timeline(fin, nav, blockOf);
+    const tl = timeline(fin, nav, blockOf, today);
     const unknown = tl.isins.filter(i => !navData.funds[i] && !i.startsWith("__transito:"));
     return { orders, bad, fin, holdings, warnings, nav, tl, unknown };
   }
@@ -630,6 +631,8 @@ function toast(msg) { const t = $("#toast"); t.textContent = msg; t.hidden = fal
 
 // ---------- carga ----------
 const IN_CLAUDE = !!(window.claude && window.claude.use);
+// hoy en la fecha local del visor: el rango se puede extender hasta aquí
+const todayDay = () => { const t = new Date(); return E.dayOf(t.getFullYear(), t.getMonth() + 1, t.getDate()); };
 let EMBEDDED = null;
 function show() {
   const has = !!CSV;
@@ -669,7 +672,9 @@ async function boot() {
 }
 
 function compute() {
-  R = E.run(CSV, NAV, OVERRIDES);
+  R = E.run(CSV, NAV, OVERRIDES, todayDay());
+  R.ordersAfterNav = R.fin.some(o => o.exec > R.nav.lastReal);
+  R.navStale = todayDay() - R.nav.lastReal > 4; // los VL salen con 1-3 días de retraso: solo avisar si es más
   const present = BLOCKS.filter(b => R.tl.isins.some(i => R.tl.blockOf(i) === b));
   R.blocksPresent = present;
   if (!ui.blocks || !ui.blocks.some(b => present.includes(b))) ui.blocks = present.slice();
@@ -718,12 +723,15 @@ function renderHeader() {
     `<span class="chip">${esc(CSVNAME)} · ${src}</span>`,
     `<span class="chip">${nFin} órdenes ejecutadas de ${nOrd}</span>`,
     `<span class="chip">Última orden ${E.fmt(lastOrder)}</span>`,
-    `<span class="chip ${R.tl.end > R.nav.lastReal ? "est" : ""}">Valores liquidativos exactos hasta ${E.fmt(R.nav.lastReal)}</span>`,
+    `<span class="chip ${R.ordersAfterNav || R.navStale ? "est" : ""}">Valores liquidativos exactos hasta ${E.fmt(R.nav.lastReal)}</span>`,
   ].join("");
   $("#subtitle").textContent = `Ganancias, aportaciones y evolución desde tu primera orden, el ${E.fmt(Math.min(...R.orders.map(o => o.day)))}.`;
   const notes = [];
-  if (R.tl.end > R.nav.lastReal || R.unknown.length)
-    notes.push(`<div class="notice"><span>⚠</span><span>Hay <b>valores estimados</b> después del ${E.fmt(R.nav.lastReal)}${R.unknown.length ? ` y para ${R.unknown.length} fondo(s) sin histórico (${R.unknown.map(esc).join(", ")})` : ""}: se calculan con los precios de tus órdenes. ${IN_CLAUDE ? "Para tener los exactos, pide a Claude «actualiza los valores liquidativos del panel»." : "Los exactos se añaden solos cada día laborable; vuelve a abrir el panel más adelante."}</span></div>`);
+  const refresh = IN_CLAUDE ? "Para tener los exactos, pide a Claude «actualiza los valores liquidativos del panel»." : "Los exactos se añaden solos cada día laborable; vuelve a abrir el panel más adelante.";
+  if (R.ordersAfterNav || R.unknown.length)
+    notes.push(`<div class="notice"><span>⚠</span><span>Hay <b>valores estimados</b> después del ${E.fmt(R.nav.lastReal)}${R.unknown.length ? ` y para ${R.unknown.length} fondo(s) sin histórico (${R.unknown.map(esc).join(", ")})` : ""}: se calculan con los precios de tus órdenes. ${refresh}</span></div>`);
+  else if (R.navStale)
+    notes.push(`<div class="notice ok"><span>ℹ</span><span>Los últimos valores liquidativos son del ${E.fmt(R.nav.lastReal)}. Hasta hoy se mantiene ese último valor (zona «estimado» de las gráficas). ${refresh}</span></div>`);
   R.warnings.forEach(w => notes.push(`<div class="notice"><span>⚠</span><span>${esc(w)}</span></div>`));
   if (R.bad.length) notes.push(`<div class="notice"><span>⚠</span><span>${R.bad.length} línea(s) del CSV sin fecha válida se han ignorado (líneas ${R.bad.slice(0, 8).join(", ")}${R.bad.length > 8 ? "…" : ""}).</span></div>`);
   const auto = R.fin.filter(o => o.auto);
@@ -831,10 +839,20 @@ function renderEvo(ag, a, b) {
     title = "Ganancia acumulada desde el inicio del rango";
     sub = "Valor − valor inicial − entradas netas, día a día.";
     const pos = css("--pos"), neg = css("--neg");
-    series = [{ name: "Ganancia", type: "line", showSymbol: false, sampling: "lttb", lineStyle: { width: 2 },
-      data: days.map(d => [E.ts(d), ag.v[d - tl.d0] - v0 - (ag.cf[d - tl.d0] - cf0)]), areaStyle: { opacity: .12 },
+    const data = days.map(d => [E.ts(d), ag.v[d - tl.d0] - v0 - (ag.cf[d - tl.d0] - cf0)]);
+    const ys = data.map(p => p[1]).filter(Number.isFinite);
+    // Color por signo con un degradado de corte duro en 0 (visualMap rompe ECharts 5.5 en esta serie).
+    // El degradado va en coordenadas de la caja de cada forma: la línea va de máx a mín; el área llega hasta 0.
+    const split = (hi, lo, op) => {
+      const o = hi > lo ? Math.min(1, Math.max(0, hi / (hi - lo))) : (hi >= 0 ? 1 : 0);
+      const p = op == null ? pos : pos + op, n = op == null ? neg : neg + op;
+      return new echarts.graphic.LinearGradient(0, 0, 0, 1, [{ offset: 0, color: p }, { offset: o, color: p }, { offset: o, color: n }, { offset: 1, color: n }]);
+    };
+    const hi = Math.max(...ys), lo = Math.min(...ys);
+    series = [{ name: "Ganancia", type: "line", showSymbol: false, sampling: "lttb", data,
+      lineStyle: { width: 2, color: split(hi, lo) }, itemStyle: { color: hi >= 0 ? pos : neg },
+      areaStyle: { color: split(Math.max(hi, 0), Math.min(lo, 0), "1f") },
       markLine: { silent: true, symbol: "none", lineStyle: { color: css("--axis"), type: "solid" }, label: { show: false }, data: [{ yAxis: 0 }] }, markArea: estArea(a, b) }];
-    B.visualMap = { show: false, type: "piecewise", dimension: 1, pieces: [{ lt: 0, color: neg }, { gte: 0, color: pos }] };
     legend = [["Ganancia ≥ 0", pos], ["Ganancia < 0", neg]];
   } else {
     title = "Rentabilidad ponderada por tiempo (base 100)";
@@ -1066,7 +1084,7 @@ $("#dl-orders").onclick = () => {
 // ---------- subida de CSV ----------
 async function loadCsvText(text, name) {
   let test;
-  try { test = E.run(text, NAV, OVERRIDES); }
+  try { test = E.run(text, NAV, OVERRIDES, todayDay()); }
   catch (e) { toast("No se pudo leer el CSV: " + e.message); return; }
   CSV = text; CSVNAME = name;
   let where = "en este navegador";
