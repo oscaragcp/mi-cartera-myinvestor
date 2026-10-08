@@ -135,7 +135,7 @@ details.faq p { margin: .5em 0 .2em; color: var(--ink-2); }
         <div class="card"><b>Sin servidor</b><span>Una página HTML con JavaScript. Todo se calcula en tu navegador.</span></div>
         <div class="card"><b>Privado</b><span>Tu CSV no se sube a ningún sitio; se guarda solo en tu navegador.</span></div>
         <div class="card"><b>Precios diarios</b><span>Valores liquidativos oficiales de cada fondo, actualizados cada día laborable.</span></div>
-        <div class="card"><b>Por año de cuenta</b><span>Agrupa por años del 31/05 al 31/05, años naturales, trimestres o meses.</span></div>
+        <div class="card"><b>Por año de cuenta</b><span>Agrupa por años de cuenta (desde el día de tu primera orden o el que elijas), años naturales, trimestres o meses.</span></div>
       </div>
       <p>Dirección del panel: <a href="../">oscaragcp.github.io/mi-cartera-myinvestor</a>. Código fuente: <a href="https://github.com/oscaragcp/mi-cartera-myinvestor">github.com/oscaragcp/mi-cartera-myinvestor</a>.</p>
     </section>
@@ -185,9 +185,9 @@ details.faq p { margin: .5em 0 .2em; color: var(--ink-2); }
       <div class="tbl"><table>
         <thead><tr><th>Filtro</th><th>Qué hace</th></tr></thead>
         <tbody>
-          <tr><td>Rango</td><td><b>Todo</b>, <b>Año de cuenta actual</b> (desde el último 31/05), <b>Este año</b>, <b>12 meses</b> y <b>3 años</b>, o fechas a mano en <i>Desde</i> y <i>Hasta</i>. El rango llega siempre <b>hasta hoy</b>, aunque no haya órdenes recientes.</td></tr>
-          <tr><td>Fondos</td><td>Activa o desactiva bloques: Desarrollados, Emergentes, Monetario y Cartera automatizada (los fondos de una cartera gestionada). Debe quedar al menos uno.</td></tr>
-          <tr><td>Agrupar por</td><td>Cómo se cortan los periodos en gráficas y tablas: año de cuenta (31/05 → 31/05), año natural, trimestre o mes. Un periodo recortado por el rango se marca con <code>*</code>.</td></tr>
+          <tr><td>Rango</td><td><b>Todo</b>, <b>Año de cuenta actual</b> (desde el último inicio de tu año de cuenta), <b>Este año</b>, <b>12 meses</b> y <b>3 años</b>, o fechas a mano en <i>Desde</i> y <i>Hasta</i>. El rango llega siempre <b>hasta hoy</b>, aunque no haya órdenes recientes.</td></tr>
+          <tr><td>Fondos</td><td>Activa o desactiva bloques según la categoría Morningstar de cada fondo: RV desarrollada, RV emergente, Renta fija, Monetario, Mixtos y Otros. Debe quedar al menos uno.</td></tr>
+          <tr><td>Agrupar por</td><td>Cómo se cortan los periodos en gráficas y tablas: año de cuenta, año natural, trimestre o mes. Un periodo recortado por el rango se marca con <code>*</code>. El año de cuenta empieza por defecto el día y mes de tu primera orden; puedes cambiarlo en «empieza el» (dd/mm).</td></tr>
         </tbody>
       </table></div>
 
@@ -208,7 +208,7 @@ details.faq p { margin: .5em 0 .2em; color: var(--ink-2); }
       <div class="tbl"><table>
         <thead><tr><th>Gráfica</th><th>Qué muestra</th></tr></thead>
         <tbody>
-          <tr><td>Evolución</td><td>Tres vistas: <b>Valor y aportado</b> (valor de la cartera frente a dinero aportado; el hueco es la ganancia), <b>Ganancia acumulada</b> (azul por encima de 0, rojo por debajo) y <b>Rentabilidad (base 100)</b> (cómo habrían crecido 100 € sin efecto de las aportaciones). Líneas verticales en cada 31/05 y zona «estimado» cuando no hay precios oficiales.</td></tr>
+          <tr><td>Evolución</td><td>Tres vistas: <b>Valor y aportado</b> (valor de la cartera frente a dinero aportado; el hueco es la ganancia), <b>Ganancia acumulada</b> (azul por encima de 0, rojo por debajo) y <b>Rentabilidad (base 100)</b> (cómo habrían crecido 100 € sin efecto de las aportaciones). Líneas verticales en cada inicio de año de cuenta y zona «estimado» cuando no hay precios oficiales.</td></tr>
           <tr><td>Ganancia por periodo</td><td>Barras por periodo. <b>Pulsa una barra</b> para filtrar el panel a ese periodo.</td></tr>
           <tr><td>De lo aportado al valor final</td><td>Cascada: valor inicial + entradas netas + ganancia de cada periodo = valor final.</td></tr>
           <tr><td>Entradas netas por periodo</td><td>Compras − ventas apiladas por bloque. En un traspaso, sale de un bloque y entra en otro.</td></tr>
@@ -271,11 +271,14 @@ details.faq p { margin: .5em 0 .2em; color: var(--ink-2); }
       <p>Por orden de prioridad:</p>
       <ol>
         <li><b>Corrección manual</b> hecha con el botón de la tabla de órdenes.</li>
-        <li><b>Ventas ya identificadas</b> hasta el 05/10/2026, guardadas en el código como huellas anónimas (ver <a href="#privacidad">Privacidad</a>).</li>
-        <li><b>Detección automática</b> para órdenes posteriores al 05/10/2026: se toma como venta una orden de más de 500 € cuyas participaciones coinciden (±0,2 %) con todas las que tenías de ese fondo. Es decir, una orden que <b>vacía el fondo</b>. El panel avisa cuando aplica esta regla.</li>
-        <li>Si no, es una <b>compra</b>.</li>
+        <li><b>Columna de tipo de operación</b>, si el CSV la trae (compra/suscripción o venta/reembolso).</li>
+        <li><b>No se puede vender más de lo que se tiene</b>: una orden con más participaciones de las que había es una compra.</li>
+        <li><b>Vacía el fondo</b>: sus participaciones (solas o sumadas las del mismo fondo ese día) igualan, ±0,2 %, las que había. Es una venta.</li>
+        <li><b>Recibe un traspaso</b>: una orden cuyo importe coincide (±2,5 %) con una venta de otro fondo de ese día o de los 10 anteriores es la compra de ese traspaso.</li>
+        <li><b>Venta parcial de un traspaso o reajuste</b>: una orden con céntimos cuyo importe reaparece (±2,5 %) como compra con céntimos de otro fondo en los 10 días siguientes.</li>
+        <li>Si no, es una <b>compra</b>. Los importes redondos (300 €, 1.000 €…) se toman siempre como compra, porque el importe de una venta es una estimación (participaciones × precio) con céntimos.</li>
       </ol>
-      <p>Una venta parcial nueva no se puede deducir: corrígela con el botón. Si las participaciones de un fondo quedan negativas, el panel avisa, porque seguramente hay una venta tomada como compra.</p>
+      <p>Todo se deduce <b>solo con el CSV que subes</b>: el código no guarda órdenes, ventas ni importes de ninguna cuenta. Un reembolso parcial a la cuenta corriente no deja rastro en el CSV; el panel marca como <i>¿venta?</i> las órdenes con céntimos que están solas en su día, para que las revises. Si las participaciones de un fondo quedan negativas, el panel avisa, porque seguramente hay una venta tomada como compra.</p>
 
       <h3>Traspasos</h3>
       <p>MyInvestor ejecuta un traspaso como una venta seguida de compras. El panel agrupa las ventas separadas por 3 días o menos y busca compras de <b>otros fondos</b> en los 10 días siguientes cuya suma coincida con lo vendido (±6 %). Si las encuentra:</p>
@@ -303,25 +306,26 @@ details.faq p { margin: .5em 0 .2em; color: var(--ink-2); }
         <li>Si no, se mantiene el último precio conocido hasta hoy.</li>
         <li>Esos días se sombrean como «estimado» en las gráficas. El aviso de la cabecera solo sale si hay órdenes sin precio oficial o si el último precio tiene más de 4 días.</li>
       </ul>
-      <p>Un fondo que no esté en <code>data/funds.json</code> se valora solo con los precios de tus órdenes y aparece como «sin histórico» en los avisos. Para añadirlo, consulta <a href="#mantenimiento">Mantenimiento</a>.</p>
+      <p>Para cualquier fondo del CSV que no esté en <code>data/navs.json</code>, o del que falten fechas (antes del primer precio guardado o después del último), el panel <b>descarga los valores liquidativos de Morningstar desde tu navegador</b> al abrirlo, junto con su nombre y categoría, y los guarda en caché. Solo se envían a Morningstar los ISIN, nunca el CSV ni importes. Si la descarga falla, ese fondo se valora con los precios de tus órdenes y el aviso lo indica como aproximado.</p>
     </section>
 
     <section id="privacidad">
       <h2>Privacidad y almacenamiento</h2>
       <ul>
-        <li>El CSV se lee con JavaScript en tu navegador. <b>No se envía a ningún servidor</b>: la página solo descarga sus propios archivos, la librería de gráficas y las fuentes.</li>
+        <li>El CSV se lee con JavaScript en tu navegador. <b>No se envía a ningún servidor</b>: la página solo descarga sus propios archivos, la librería de gráficas, las fuentes y los valores liquidativos de Morningstar de los fondos de tu CSV (por ISIN).</li>
         <li>Se guarda en el <code>localStorage</code> de tu navegador, solo para esta dirección:
           <div class="tbl"><table>
             <thead><tr><th>Clave</th><th>Contenido</th></tr></thead>
             <tbody>
               <tr><td><code>panel-csv</code></td><td>Texto y nombre del último CSV subido.</td></tr>
-              <tr><td><code>panel-overrides</code></td><td>Correcciones manuales de compra/venta.</td></tr>
-              <tr><td><code>panel-ui</code></td><td>Filtros y vistas elegidos.</td></tr>
+              <tr><td><code>panel-ajustes</code></td><td>Correcciones manuales de compra/venta e inicio del año de cuenta, <b>ligados a cada cuenta</b>: se guardan con huellas de sus órdenes más antiguas y solo se aplican a un CSV que las contenga. Subir el CSV de otra persona empieza sin ajustes.</td></tr>
+              <tr><td><code>panel-navcache</code></td><td>Valores liquidativos descargados de Morningstar (datos públicos).</td></tr>
+              <tr><td><code>panel-ui2</code></td><td>Filtros y vistas elegidos.</td></tr>
             </tbody>
           </table></div>
         </li>
         <li>El botón <b>Borrar mis datos de este navegador</b> elimina el CSV y las correcciones. Abrir el panel en modo privado o desde otro dispositivo empieza sin datos.</li>
-        <li>El repositorio es público y <b>no contiene datos personales</b>: <code>.gitignore</code> excluye cualquier <code>*.csv</code>. Las ventas ya identificadas se guardan como <b>huellas</b> (hash cyrb53 en base 36 de <code>ISIN|dd/mm/aaaa|participaciones</code>), que permiten reconocer una orden concreta sin publicar su fecha, fondo ni importe.</li>
+        <li>El repositorio es público y <b>no contiene datos personales</b>: <code>.gitignore</code> excluye cualquier <code>*.csv</code>, y el código no contiene órdenes, ventas, importes ni fechas de ninguna cuenta: todo se deduce del CSV que sube cada usuario.</li>
         <li>Sí son públicos la lista de fondos de <code>data/funds.json</code> y sus valores liquidativos.</li>
       </ul>
     </section>
@@ -333,8 +337,8 @@ details.faq p { margin: .5em 0 .2em; color: var(--ink-2); }
         <thead><tr><th>Archivo</th><th>Función</th></tr></thead>
         <tbody>
           <tr><td><code>index.html</code></td><td>El panel completo: estilos, motor de cálculo e interfaz en un solo archivo.</td></tr>
-          <tr><td><code>data/funds.json</code></td><td>Fondos conocidos: ISIN → SecId de Morningstar, nombre, bloque y fechas de descarga (<code>from</code>, <code>to</code>; <code>to: null</code> = hasta hoy).</td></tr>
-          <tr><td><code>data/navs.json</code></td><td>Valores liquidativos diarios. Formato: <code>{epoch, generated, funds: {ISIN: {name, block, secid, nav: [[día, valor], …]}}}</code>, con <i>día</i> = días desde el 01/01/2021.</td></tr>
+          <tr><td><code>data/funds.json</code></td><td>Fondos precargados (para abrir más rápido): ISIN → SecId de Morningstar, nombre, categoría Morningstar, bloque y fechas de descarga (<code>from</code>, <code>to</code>; <code>to: null</code> = hasta hoy).</td></tr>
+          <tr><td><code>data/navs.json</code></td><td>Valores liquidativos diarios. Formato: <code>{epoch, generated, funds: {ISIN: {name, block, category, secid, nav: [[día, valor], …]}}}</code>, con <i>día</i> = días desde el 01/01/2021.</td></tr>
           <tr><td><code>scripts/update_navs.py</code></td><td>Descarga los valores liquidativos y reescribe <code>navs.json</code> (Python estándar, sin dependencias).</td></tr>
           <tr><td><code>.github/workflows/update-navs.yml</code></td><td>Ejecuta el script cada día laborable y hace commit si hay cambios.</td></tr>
           <tr><td><code>docs/index.html</code></td><td>Esta documentación.</td></tr>
@@ -364,25 +368,11 @@ details.faq p { margin: .5em 0 .2em; color: var(--ink-2); }
     <section id="mantenimiento">
       <h2>Mantenimiento</h2>
 
-      <h3>Añadir un fondo nuevo</h3>
-      <ol>
-        <li>Busca el fondo en Morningstar España y copia su <b>SecId</b> (el identificador de 10 caracteres de la URL, p. ej. <code>F00000XXXX</code>).</li>
-        <li>Añádelo a <code>data/funds.json</code>:
-<pre><code>"IE00XXXXXXXX": {
-  "secid": "F00000XXXX",
-  "name": "Nombre corto del fondo",
-  "block": "Desarrollados",
-  "from": "2021-05-01",
-  "to": null
-}</code></pre>
-          <code>block</code> debe ser uno de: Desarrollados, Emergentes, Monetario o Cartera automatizada. Cualquier otro valor se agrupa como «Otros».</li>
-        <li>Haz commit y push, y lanza la acción <i>Actualizar valores liquidativos</i> desde la pestaña <i>Actions</i> (o espera a la siguiente ejecución programada).</li>
-      </ol>
+      <h3>Fondos nuevos</h3>
+      <p>No hace falta hacer nada: el panel descarga solo los precios de cualquier fondo del CSV. Añadirlo a <code>data/funds.json</code> (con <code>secid</code>, <code>name</code>, <code>category</code> —la categoría Morningstar—, <code>block</code>, <code>from</code> y <code>to: null</code>) solo sirve para que la acción diaria lo precargue. El bloque lo decide siempre la categoría (función <code>blockFor</code> del motor).</p>
 
-      <h3>Registrar una venta parcial</h3>
-      <p>Lo más sencillo es corregirla con el botón de la tabla de órdenes, pero esa corrección solo vive en tu navegador. Para fijarla en el código, calcula su huella y añádela a <code>KNOWN_SELLS</code> en <code>index.html</code>. La función <code>fp</code> es interna al motor: copia su definición (busca <code>const fp =</code>) en la consola del navegador y ejecútala con la clave de la orden:</p>
-<pre><code>fp("IE00XXXXXXXX|15/11/2026|12.345")   // ISIN|fecha de la orden|participaciones tal como salen en el CSV</code></pre>
-<p>Si además conoces el importe real cobrado, añádelo a <code>KNOWN_SALE_VALUE</code> con la misma huella.</p>
+      <h3>Corregir una orden</h3>
+      <p>Usa el botón de la tabla de órdenes («Es una venta» / «Es una compra»). La corrección se guarda en tu navegador, ligada a tu cuenta. El código no guarda correcciones de nadie.</p>
 
       <h3>Cambiar el panel</h3>
       <ol>
@@ -399,7 +389,8 @@ details.faq p { margin: .5em 0 .2em; color: var(--ink-2); }
       <ul>
         <li>Solo fondos de inversión del CSV de órdenes. No incluye acciones, ETF, cuentas ni depósitos.</li>
         <li>No descuenta comisiones cobradas fuera de los fondos (custodia, gestión de carteras automatizadas cobrada en cuenta) ni impuestos. Los gastos internos de cada fondo ya están en su valor liquidativo.</li>
-        <li>Las ventas parciales posteriores al 05/10/2026 hay que marcarlas a mano.</li>
+        <li>Los reembolsos parciales a la cuenta corriente (sin traspaso a otro fondo) no se pueden deducir: el panel los señala como <i>¿venta?</i> y hay que confirmarlos con el botón.</li>
+        <li>Las ventas sin traspaso se valoran con el valor liquidativo del primer día hábil tras la orden; el CSV no trae el importe cobrado.</li>
         <li>Fechas de ejecución y precios de venta deducidos: pueden diferir en céntimos de los de tus extractos.</li>
         <li>Órdenes en otras monedas: se valoran con el precio en euros del fondo, no con el tipo de cambio de la orden.</li>
         <li>Los últimos días se valoran con el último precio publicado hasta que llega el oficial.</li>
@@ -427,6 +418,7 @@ details.faq p { margin: .5em 0 .2em; color: var(--ink-2); }
       <div class="tbl"><table>
         <thead><tr><th>Fecha</th><th>Cambio</th></tr></thead>
         <tbody>
+          <tr><td>08/10/2026</td><td><b>Panel válido para cualquier cuenta.</b> Se eliminan del código las ventas e importes de la cuenta del autor: compras y ventas se deducen solo del CSV (vacía el fondo, traspasos y reajustes entre fondos, columna de tipo si existe). Los valores liquidativos que falten se descargan de Morningstar para cualquier fondo y fecha. Bloques por categoría Morningstar. Año de cuenta desde la primera orden (configurable). Las correcciones manuales quedan ligadas a cada cuenta. Lectura del CSV más robusta (separadores, miles, comillas, líneas de título).</td></tr>
           <tr><td>07/10/2026</td><td>Documentación publicada en <code>/docs/</code>.</td></tr>
           <tr><td>07/10/2026</td><td>El rango de fechas llega siempre hasta hoy; los días sin precio oficial mantienen el último valor. La fecha de «valores liquidativos exactos» se calcula con los fondos que tienes hoy. Avisos solo cuando los precios llevan más de 4 días sin actualizarse.</td></tr>
           <tr><td>07/10/2026</td><td>Arreglada la vista «Ganancia acumulada», que se mostraba vacía.</td></tr>

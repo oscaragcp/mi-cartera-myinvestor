@@ -16,7 +16,7 @@
 :root {
   --bg: #f3f4f6; --surface: #fcfcfb; --surface-2: #eceef1; --ink: #121417; --ink-2: #4b5059; --muted: #7d828b;
   --grid: #e3e5e9; --axis: #c3c7ce; --border: rgba(18,20,23,.10); --focus: #2a78d6;
-  --s1: #2a78d6; --s2: #eb6834; --s3: #1baf7a; --s4: #eda100; --s5: #e87ba4;
+  --s1: #2a78d6; --s2: #eb6834; --s3: #1baf7a; --s4: #eda100; --s5: #e87ba4; --s6: #8a8f98;
   --pos: #2a78d6; --neg: #e34948; --mid: #f0efec; --good-ink: #006300; --bad-ink: #b42828;
   --warn-bg: #fff4d6; --warn-ink: #6b4a00; --est: rgba(237,161,0,.10);
   --f-display: "Bricolage Grotesque", "Figtree", system-ui, sans-serif;
@@ -26,13 +26,13 @@
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
   --bg: #0d0d0d; --surface: #1a1a19; --surface-2: #242423; --ink: #ffffff; --ink-2: #c3c2b7; --muted: #8f8d86;
   --grid: #2c2c2a; --axis: #45453f; --border: rgba(255,255,255,.10); --focus: #3987e5;
-  --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500; --s5: #d55181;
+  --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500; --s5: #d55181; --s6: #8f8d86;
   --pos: #3987e5; --neg: #e66767; --mid: #383835; --good-ink: #0ca30c; --bad-ink: #ff8a8a;
   --warn-bg: #3a2e0c; --warn-ink: #ffd877; --est: rgba(201,133,0,.14); color-scheme: dark; } }
 :root[data-theme="dark"] {
   --bg: #0d0d0d; --surface: #1a1a19; --surface-2: #242423; --ink: #ffffff; --ink-2: #c3c2b7; --muted: #8f8d86;
   --grid: #2c2c2a; --axis: #45453f; --border: rgba(255,255,255,.10); --focus: #3987e5;
-  --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500; --s5: #d55181;
+  --s1: #3987e5; --s2: #d95926; --s3: #199e70; --s4: #c98500; --s5: #d55181; --s6: #8f8d86;
   --pos: #3987e5; --neg: #e66767; --mid: #383835; --good-ink: #0ca30c; --bad-ink: #ff8a8a;
   --warn-bg: #3a2e0c; --warn-ink: #ffd877; --est: rgba(201,133,0,.14); color-scheme: dark; }
 
@@ -122,7 +122,7 @@ details.method summary { cursor: pointer; font-family: var(--f-display); font-we
 details.method div { max-width: 78ch; color: var(--ink-2); font-size: .9rem; }
 details.method li { margin-block: 4px; }
 .drop { position: fixed; inset: 0; z-index: 20; display: grid; place-items: center; background: color-mix(in srgb, var(--bg) 80%, transparent); border: 3px dashed var(--s1); font-family: var(--f-display); font-size: 1.4rem; }
-.drop[hidden], .toast[hidden], #dash[hidden], .empty[hidden] { display: none !important; }
+.drop[hidden], .toast[hidden], #dash[hidden], .empty[hidden], #acct-box[hidden] { display: none !important; }
 .empty { background: var(--surface); border-radius: var(--r); padding: 22px 24px; display: grid; gap: 10px; max-width: 760px; }
 .empty h2 { font-size: 1.35rem; }
 .empty p, .empty ol { margin: 0; color: var(--ink-2); }
@@ -179,11 +179,12 @@ details.method li { margin-block: 4px; }
     <div class="fgroup">
       <label class="flabel" for="group">Agrupar por</label>
       <select id="group">
-        <option value="account">Año de cuenta (31/05)</option>
+        <option value="account" id="opt-acct">Año de cuenta</option>
         <option value="year">Año natural</option>
         <option value="quarter">Trimestre</option>
         <option value="month">Mes</option>
       </select>
+      <span id="acct-box" class="fgroup"><label class="muted" for="acct" style="font-size:.8rem">empieza el</label><input type="text" id="acct" inputmode="numeric" placeholder="dd/mm" size="5" maxlength="5" title="Día y mes en que empieza tu año de cuenta" style="border:1px solid var(--border);background:var(--surface);border-radius:7px;padding:4px 8px;font-size:.84rem;width:4.6em"></span>
     </div>
   </nav>
 
@@ -272,11 +273,12 @@ details.method li { margin-block: 4px; }
     <div>
       <ul>
         <li><b>Ganancia de un periodo</b> = valor al final − valor al inicio − entradas netas (compras − ventas) del periodo. Lo que aportas no cuenta como ganancia.</li>
-        <li><b>Valores liquidativos</b>: diarios y oficiales (Morningstar) hasta la fecha indicada arriba. Si el CSV trae órdenes posteriores, el panel estima el valor con los precios de esas órdenes y lo marca como <i>estimado</i>.</li>
-        <li><b>Compras y ventas</b>: el CSV de MyInvestor no dice si una orden es compra o venta. El panel lo deduce: ventas ya identificadas hasta 10/2026 y, después, cualquier orden que vacía un fondo. Si alguna sale mal, cámbiala en la tabla de órdenes.</li>
-        <li><b>Traspasos</b>: una venta seguida en 10 días de compras por el mismo importe se trata como traspaso. Esa fecha se usa para valorar la venta con el precio real.</li>
-        <li><b>No incluido</b>: comisiones de la cartera automatizada (2021-22) y de custodia, que se cobraban de la cuenta corriente, ni las acciones compradas en 2023.</li>
-        <li><b>Actualizar</b>: exporta de nuevo las órdenes desde MyInvestor (web → Consulta de operaciones → Descargar) y súbelas con «Subir CSV actualizado» o arrastrando el archivo aquí. Se recalcula al momento y se guarda <span class="m-save">en el panel</span>. <span class="m-nav">Para tener valores liquidativos exactos de fechas nuevas, pide a Claude: «actualiza los valores liquidativos del panel».</span></li>
+        <li><b>Valores liquidativos</b>: diarios y oficiales (Morningstar) para cada fondo de tu CSV, hasta la fecha indicada arriba. Si para algún fondo o fecha no hay precio oficial, el panel lo estima con los precios de tus propias órdenes y lo marca como <i>estimado</i>.</li>
+        <li><b>Compras y ventas</b>: el CSV de MyInvestor no dice si una orden es compra o venta. El panel lo deduce solo con tu CSV: no se puede vender más de lo que se tiene; una orden que vacía un fondo es una venta; y una orden cuyo importe reaparece en los 10 días siguientes como compra de otro fondo es la venta de un traspaso o reajuste. Lo demás se toma como compra. Si alguna sale mal, cámbiala en la tabla de órdenes.</li>
+        <li><b>Traspasos</b>: una venta seguida en 10 días de compras por el mismo importe se trata como traspaso. Esa fecha se usa para valorar la venta con el precio real. En las ventas sin traspaso se usa el valor liquidativo del primer día hábil tras la orden (el CSV no trae el importe cobrado).</li>
+        <li><b>Bloques</b>: cada fondo se agrupa por su categoría Morningstar (renta variable desarrollada o emergente, renta fija, monetario, mixtos u otros).</li>
+        <li><b>No incluido</b>: comisiones cobradas fuera del fondo (por ejemplo, las de gestión de una cartera automatizada o la custodia, si se cargan en la cuenta corriente), ni acciones o ETFs, que no aparecen en el CSV de órdenes de fondos.</li>
+        <li><b>Actualizar</b>: exporta de nuevo las órdenes desde MyInvestor (web → Consulta de operaciones → Descargar) y súbelas con «Subir CSV actualizado» o arrastrando el archivo aquí. Se recalcula al momento y se guarda <span class="m-save">en el panel</span>. <span class="m-nav">Los valores liquidativos de los fondos que no estén en el panel se descargan de Morningstar al abrirlo.</span></li>
         <li><b>Documentación completa</b>: guía de uso, cálculos y mantenimiento en <a href="https://oscaragcp.github.io/mi-cartera-myinvestor/docs/" target="_blank" rel="noopener">oscaragcp.github.io/mi-cartera-myinvestor/docs</a>.</li>
       </ul>
     </div>
@@ -289,7 +291,8 @@ details.method li { margin-block: 4px; }
 <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.5.0/echarts.min.js"></script>
 <script>
 /* Motor de cálculo del panel: CSV de órdenes + valores liquidativos -> series diarias y ganancias.
-   Funciones puras; sin DOM. Días = días desde 01/01/2021 (UTC). */
+   Funciones puras; sin DOM. Días = días desde 01/01/2021 (UTC; negativos para fechas anteriores).
+   No contiene datos de ninguna cuenta: todo se deduce del CSV que se sube y de los precios públicos. */
 const Engine = (() => {
   const EPOCH = Date.UTC(2021, 0, 1), DAY = 86400000;
   const pad = n => String(n).padStart(2, "0");
@@ -300,81 +303,121 @@ const Engine = (() => {
   const fromIso = s => { const [y, m, d] = s.split("-").map(Number); return dayOf(y, m, d); };
   const ts = n => EPOCH + n * DAY;
 
-  // Huella anónima de una orden ("ISIN|dd/mm/aaaa|participaciones"): permite reconocer las ventas ya
-  // identificadas sin publicar fechas, fondos ni importes.
-  const fp = str => {
-    let h1 = 0xdeadbeef ^ 7, h2 = 0x41c6ce57 ^ 7;
-    for (let i = 0; i < str.length; i++) { const ch = str.charCodeAt(i); h1 = Math.imul(h1 ^ ch, 2654435761); h2 = Math.imul(h2 ^ ch, 1597334677); }
-    h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507); h1 ^= Math.imul(h2 ^ (h2 >>> 13), 3266489909);
-    h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507); h2 ^= Math.imul(h1 ^ (h1 >>> 13), 3266489909);
-    return (4294967296 * (2097151 & h2) + (h1 >>> 0)).toString(36);
-  };
-  // Ventas identificadas cuadrando participaciones hasta 10/2026 (el CSV no distingue compra/venta).
-  const KNOWN_SELLS = new Set(["1696pdob109","2dcgmf31ful","1f2q1tpdo2f","1p2i05v9i8p","1n0za5fn7tl","1eyu48kjacf","b4fw366xuf",
-    "2duwkt5989f","1hit9wvoek7","1rm07t623mz","1a3jigbkw9d","1qhpg8hopow","2ef99my3x5f","1izfxu3jbgt","nwuxi9dpk3","kyr2ep4bce",
-    "298gfziyrq8","6qxbqo2ovw","2e9yug33hqt","18ap7gi26fj","1aymzp0uxwl","1guv6up0myr","17x2pziboaj","xqp9thx9g","bklqvioi56",
-    "17em8uyb584","1a6spdpdc8f","4s233fch57"]);
-  // Importes reales de reembolso conocidos por los correos de confirmación.
-  const KNOWN_SALE_VALUE = { "17em8uyb584": 6040.79 };
-  const KNOWN_UNTIL = dayOf(2026, 10, 5); // a partir de aquí se aplica la detección automática
+  // Bloque de un fondo según su categoría Morningstar (o, si no la hay, su nombre).
+  const BLOCKS = ["RV desarrollada", "RV emergente", "Renta fija", "Monetario", "Mixtos", "Otros"];
+  function blockFor(category, name) {
+    const c = (category || "").toLowerCase(), n = (name || "").toLowerCase();
+    if (c) {
+      if (/monetario|money market|ultra corto/.test(c)) return "Monetario";
+      if (/^mixtos?\b|allocation/.test(c)) return "Mixtos";
+      if (/^rf\b|renta fija|bonos|convertibles/.test(c)) return "Renta fija";
+      if (/^rv\b/.test(c)) return /emergent|china|india|brasil|latinoam|frontera|turqu|rusia|corea|taiw|áfrica|oriente medio|asia ex jap|asia-pacífico ex jap/.test(c) ? "RV emergente" : "RV desarrollada";
+      return "Otros";
+    }
+    if (/monetari|money market|ultra short|liquidez/.test(n)) return "Monetario";
+    if (/emerg/.test(n)) return "RV emergente";
+    if (/bond|\bbd\b|renta fija|govt|treasury|aggregate|credit|fixed inc/.test(n)) return "Renta fija";
+    if (/world|global|s&p|\busa?\b|u\.s\.|europe|stoxx|japan|pacific|msci|stock|equity|\b500\b/.test(n)) return "RV desarrollada";
+    return "Otros";
+  }
 
+  // Números con coma o punto decimal y con o sin separador de miles: "16,9", "15340.26", "1.234,56", "1,234.56".
   const num = s => {
-    s = (s || "").trim();
-    if (!s) return null;
-    if (s.includes(",") && !s.includes(".")) s = s.replace(",", ".");
-    else s = s.replace(/,/g, "");
+    s = String(s || "").replace(/[^\d,.\-]/g, "");
+    if (!/\d/.test(s)) return null;
+    const lc = s.lastIndexOf(","), lp = s.lastIndexOf(".");
+    if (lc >= 0 && lp >= 0) s = lc > lp ? s.replace(/\./g, "").replace(",", ".") : s.replace(/,/g, "");
+    else if (lc >= 0) s = s.split(",").length > 2 ? s.replace(/,/g, "") : s.replace(",", ".");
+    else if (s.split(".").length > 2) s = s.replace(/\./g, "");
     const v = parseFloat(s);
     return isFinite(v) ? v : null;
   };
+  const splitLine = (line, sep) => {
+    const out = []; let cur = "", q = false;
+    for (let i = 0; i < line.length; i++) {
+      const ch = line[i];
+      if (ch === '"') { if (q && line[i + 1] === '"') { cur += '"'; i++; } else q = !q; }
+      else if (ch === sep && !q) { out.push(cur); cur = ""; }
+      else cur += ch;
+    }
+    out.push(cur);
+    return out.map(x => x.trim());
+  };
+  const norm = s => String(s || "").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "").trim();
+  const parseDate = s => {
+    let m = String(s || "").trim().match(/^(\d{1,2})[\/.\-](\d{1,2})[\/.\-](\d{4})/);
+    if (m) return { d: +m[1], m: +m[2], y: +m[3] };
+    m = String(s || "").trim().match(/^(\d{4})-(\d{2})-(\d{2})/);
+    return m ? { d: +m[3], m: +m[2], y: +m[1] } : null;
+  };
 
   function parseCSV(text) {
-    text = text.replace(/^﻿/, "");
+    text = String(text || "").replace(/^﻿/, "");
     const lines = text.split(/\r?\n/).filter(l => l.trim());
     if (!lines.length) throw new Error("El archivo está vacío.");
-    const head = lines[0].split(";").map(s => s.trim().toLowerCase());
+    // cabecera = primera línea que nombra la columna ISIN (puede haber líneas de título antes)
+    const hi = lines.findIndex(l => /(^|[;,\t"])\s*isin\s*("|[;,\t]|$)/i.test(l));
+    if (hi < 0) throw new Error("No encuentro la columna ISIN. Sube el CSV de órdenes de fondos que exporta MyInvestor.");
+    const sep = [";", "\t", ","].map(c => [c, lines[hi].split(c).length]).sort((a, b) => b[1] - a[1])[0][0];
+    const head = splitLine(lines[hi], sep).map(norm);
     const col = test => head.findIndex(test);
     const iF = col(h => h.startsWith("fecha")), iI = col(h => h === "isin"), iA = col(h => h.startsWith("importe")),
-      iU = col(h => h.includes("participaciones")), iE = col(h => h.startsWith("estado"));
-    if ([iF, iI, iA, iU, iE].some(i => i < 0))
+      iU = col(h => h.includes("participaciones") || h.includes("titulos")), iE = col(h => h.startsWith("estado")),
+      iT = col(h => /^(tipo|operacion|sentido)/.test(h)), iN = col(h => /^(fondo|nombre|descripcion|producto)/.test(h));
+    if ([iF, iI, iU].some(i => i < 0))
       throw new Error("No reconozco las columnas. Esperaba: Fecha de la orden; ISIN; Importe estimado; Nº de participaciones; Estado.");
     const orders = [], bad = [];
-    lines.slice(1).forEach((line, k) => {
-      const c = line.split(";");
-      const m = (c[iF] || "").trim().match(/^(\d{2})\/(\d{2})\/(\d{4})$/);
-      if (!m) { bad.push(k + 2); return; }
-      const [amtTxt, cur = "EUR"] = (c[iA] || "").trim().split(/\s+/);
+    lines.slice(hi + 1).forEach((line, k) => {
+      const c = splitLine(line, sep), lineNo = hi + k + 2;
+      const dt = parseDate(c[iF]);
+      const isin = (c[iI] || "").toUpperCase().replace(/\s/g, "");
+      if (!dt || !/^[A-Z]{2}[A-Z0-9]{9}\d$/.test(isin)) { bad.push(lineNo); return; }
+      const amtTxt = iA >= 0 ? (c[iA] || "") : "";
+      const curM = amtTxt.match(/[A-Z]{3}/i);
+      const state = iE >= 0 ? (c[iE] || "").trim() : "Finalizada";
+      const tipo = iT >= 0 ? norm(c[iT]) : "";
+      const units = num(c[iU]);
       orders.push({
-        line: k + 2, dateTxt: m[0], day: dayOf(+m[3], +m[2], +m[1]), isin: (c[iI] || "").trim(),
-        amount: num(amtTxt), cur: cur.toUpperCase(), units: num(c[iU]), state: (c[iE] || "").trim(),
+        line: lineNo, dateTxt: `${pad(dt.d)}/${pad(dt.m)}/${dt.y}`, day: dayOf(dt.y, dt.m, dt.d), isin,
+        amount: num(amtTxt) == null ? null : Math.abs(num(amtTxt)), cur: curM ? curM[0].toUpperCase() : "EUR",
+        units: units == null ? null : Math.abs(units), state,
+        done: iE < 0 || /finaliz|ejecutad|complet|liquidad/i.test(state),
+        // si el CSV trae una columna de tipo de operación, manda sobre la deducción
+        typeSell: /venta|reembolso|retirada|salida|sell|redemption/.test(tipo) ? true
+          : /compra|suscrip|aportaci|entrada|buy|subscription/.test(tipo) ? false : null,
+        name: iN >= 0 ? (c[iN] || "").trim() : "",
       });
     });
+    if (!orders.length) throw new Error("El CSV no tiene ninguna orden con fecha e ISIN válidos.");
     return { orders, bad };
   }
 
-  // Valores liquidativos: reales (Morningstar) + estimados a partir de los precios de las propias órdenes.
+  // Valores liquidativos: reales (Morningstar) + estimados con los precios de las propias órdenes
+  // en las fechas que la serie real no cubre (antes de su primer dato o después del último).
   function buildNav(navData, orders) {
     const series = {};
-    for (const [isin, f] of Object.entries(navData.funds)) {
+    for (const [isin, f] of Object.entries(navData.funds || {})) {
+      if (!f.nav || !f.nav.length) continue;
       const days = f.nav.map(p => p[0]), vals = f.nav.map(p => p[1]);
-      const exact = new Map(f.nav.map(p => [p[0], p[1]]));
-      series[isin] = { days, vals, exact, last: days[days.length - 1], ext: [] };
+      series[isin] = { days, vals, exact: new Map(f.nav.map(p => [p[0], p[1]])), first: days[0], last: days[days.length - 1], ext: [] };
     }
     for (const o of orders) {
-      if (o.state !== "Finalizada" || !o.units || !o.amount || o.cur !== "EUR") continue;
-      const s = series[o.isin] || (series[o.isin] = { days: [], vals: [], exact: new Map(), last: -Infinity, ext: [] });
+      if (!o.done || !o.units || !o.amount || o.cur !== "EUR") continue;
+      const s = series[o.isin] || (series[o.isin] = { days: [], vals: [], exact: new Map(), first: Infinity, last: -Infinity, ext: [] });
       const d = o.day + 2;
-      if (d > s.last) s.ext.push([d, o.amount / o.units]);
+      if (d < s.first || d > s.last) s.ext.push([d, o.amount / o.units]);
     }
     for (const s of Object.values(series)) s.ext.sort((a, b) => a[0] - b[0]);
     const bs = (arr, x) => { let lo = 0, hi = arr.length - 1, r = -1; while (lo <= hi) { const m = (lo + hi) >> 1; if (arr[m] <= x) { r = m; lo = m + 1; } else hi = m - 1; } return r; };
     function at(isin, day) {
       const s = series[isin];
       if (!s) return { v: 0, est: true };
-      if (s.days.length && day <= s.last) {
+      if (s.days.length && day >= s.first && day <= s.last) {
         const i = bs(s.days, day);
-        return { v: s.vals[Math.max(i, 0)], est: false, d: s.days[Math.max(i, 0)] };
+        return { v: s.vals[i], est: false, d: s.days[i] };
       }
-      const pts = (s.days.length ? [[s.last, s.vals[s.vals.length - 1]]] : []).concat(s.ext);
+      const side = day < s.first ? s.ext.filter(p => p[0] < s.first) : s.ext.filter(p => p[0] > s.last);
+      const pts = !s.days.length ? side : day < s.first ? side.concat([[s.first, s.vals[0]]]) : [[s.last, s.vals[s.vals.length - 1]]].concat(side);
       if (!pts.length) return { v: 0, est: true };
       if (day <= pts[0][0]) return { v: pts[0][1], est: true };
       for (let k = 1; k < pts.length; k++) if (day <= pts[k][0]) {
@@ -388,21 +431,60 @@ const Engine = (() => {
     return { at, on, series, lastReal };
   }
 
-  function classify(orders, overrides) {
-    const fin = orders.filter(o => o.state === "Finalizada" && o.units > 0)
-      .sort((a, b) => a.day - b.day || b.line - a.line);
-    const h = {}, warnings = [];
+  // Compra o venta. El CSV de MyInvestor no lo dice, así que se deduce solo con los datos del propio CSV:
+  //  1) columna de tipo de operación, si existe, o corrección manual del usuario;
+  //  2) imposible vender más de lo que se tiene: si supera lo que hay en cartera, es compra;
+  //  3) órdenes que vacían el fondo (sus participaciones, solas o sumadas las del mismo día, igualan las que había);
+  //  4) ventas parciales de un traspaso o reajuste: su importe reaparece como compra de otro fondo en los 10 días siguientes.
+  // Las ventas llevan un importe estimado (participaciones × precio) con céntimos; un importe redondo se toma como compra.
+  function classify(orders, overrides, nav) {
+    const fin = orders.filter(o => o.done && o.units > 0).sort((a, b) => a.day - b.day || b.line - a.line);
+    const h = {}, warnings = [], used = new Set();
+    const tol = x => Math.max(0.002, x * 0.002);
+    const round = o => o.amount != null && Math.abs(o.amount - Math.round(o.amount)) < 0.005;
+    const value = o => o.cur === "EUR" && o.amount != null ? o.amount : o.units * nav.at(o.isin, o.day).v;
+    for (const o of fin) { o.key = `${o.isin}|${o.dateTxt}|${o.units}`; o.sell = null; o.manual = o.auto = o.doubt = false; o.why = ""; }
     for (const o of fin) {
-      const okey = `${o.isin}|${o.dateTxt}|${o.units}`;
-      let sell;
-      if (overrides && okey in overrides) { sell = overrides[okey]; o.manual = true; }
-      else if (KNOWN_SELLS.has(fp(okey))) sell = true;
-      else if (o.day > KNOWN_UNTIL && (h[o.isin] || 0) > 0 &&
-        Math.abs(o.units - h[o.isin]) <= Math.max(0.002, h[o.isin] * 0.002) && (o.amount || 0) > 500) { sell = true; o.auto = true; }
-      else sell = false;
-      o.sell = sell; o.key = okey;
-      h[o.isin] = (h[o.isin] || 0) + (sell ? -o.units : o.units);
-      if (h[o.isin] < -0.002) warnings.push(`${o.isin}: participaciones negativas tras la orden del ${o.dateTxt}. Revisa si es compra o venta.`);
+      if (overrides && o.key in overrides) { o.sell = !!overrides[o.key]; o.manual = true; }
+      else if (o.typeSell != null) { o.sell = o.typeSell; o.why = "csv"; }
+    }
+    const byDay = new Map();
+    fin.forEach(o => byDay.has(o.day) ? byDay.get(o.day).push(o) : byDay.set(o.day, [o]));
+    // mismo dinero: el importe de la venta es estimado y la compra se hace días después, así que se admite un 2,5 % (3,5 % si hay divisa)
+    const sameVal = (x, y) => Math.abs(value(x) - value(y)) <= Math.max(0.05, value(x) * (x.cur === "EUR" && y.cur === "EUR" ? 0.025 : 0.035));
+    for (const [day, list] of byDay) {
+      const byIsin = new Map();
+      list.forEach(o => byIsin.has(o.isin) ? byIsin.get(o.isin).push(o) : byIsin.set(o.isin, [o]));
+      const avail = {};
+      // a) lo ya decidido y las órdenes que vacían un fondo
+      for (const [isin, g] of byIsin) {
+        let av = (h[isin] || 0) + g.reduce((a, o) => a + (o.sell === false ? o.units : o.sell === true ? -o.units : 0), 0);
+        const r = g.filter(o => o.sell === null && !round(o)), sum = r.reduce((a, o) => a + o.units, 0);
+        if (av > 0.0005 && r.length) {
+          const hit = r.length > 1 && Math.abs(sum - av) <= tol(av) ? r : [r.find(o => Math.abs(o.units - av) <= tol(av))].filter(Boolean);
+          hit.forEach(o => { o.sell = true; o.auto = true; o.why = "vacía"; av -= o.units; });
+        }
+        avail[isin] = av;
+      }
+      // b) compras que reciben el dinero de ventas de este día o de los 10 anteriores (traspasos y reajustes)
+      for (const o of list) if (o.sell === null) {
+        const src = fin.find(s => s.sell === true && !used.has(s) && s.isin !== o.isin && s.day <= day && s.day >= day - 10 && sameVal(s, o));
+        if (src) { used.add(src); used.add(o); o.sell = false; }
+      }
+      // c) el resto: compra salvo que su importe reaparezca como compra de otro fondo en los 10 días siguientes
+      for (const o of list) if (o.sell === null) {
+        const av = avail[o.isin];
+        if (o.units > av + tol(Math.max(av, 0)) || round(o) || o.amount == null) { o.sell = false; continue; }
+        const match = fin.find(b => b !== o && !used.has(b) && b.isin !== o.isin && b.sell !== true && !round(b) && b.day >= day && b.day <= day + 10 && sameVal(o, b) &&
+          (b.day > day || b.units > (avail[b.isin] ?? 0) + tol(Math.max(avail[b.isin] ?? 0, 0))));
+        if (match) { used.add(match); used.add(o); match.sell = false; o.sell = true; o.auto = true; o.why = "traspaso"; avail[o.isin] -= o.units; }
+        else { o.sell = false; o.doubt = list.length === 1; } // sola ese día y con céntimos: podría ser un reembolso parcial a la cuenta
+      }
+      for (const [isin, g] of byIsin) {
+        const v = (h[isin] || 0) + g.reduce((a, o) => a + (o.sell ? -o.units : o.units), 0);
+        h[isin] = Math.abs(v) < 0.0015 ? 0 : v;
+        if (h[isin] < -0.002) warnings.push(`${isin}: participaciones negativas tras la orden del ${g[0].dateTxt}. Puede faltar alguna compra anterior en el CSV o haber una orden mal clasificada; revísalo en la tabla de órdenes.`);
+      }
     }
     return { fin, holdings: h, warnings };
   }
@@ -419,8 +501,9 @@ const Engine = (() => {
     for (const c of clusters) {
       const isins = new Set(c.items.map(s => s.isin));
       const est = c.items.reduce((a, s) => a + estVal(s), 0);
+      if (!(est > 0)) continue;
       const cand = buys.filter(b => !b.internal && b.day >= c.start && b.day <= c.end + 10 && !isins.has(b.isin));
-      const bval = b => b.cur === "EUR" ? b.amount : estVal(b);
+      const bval = b => b.cur === "EUR" && b.amount != null ? b.amount : estVal(b);
       const options = [];
       let acc = 0;
       cand.forEach((b, i) => { acc += bval(b); options.push({ set: cand.slice(0, i + 1), sum: acc }); options.push({ set: [b], sum: bval(b) }); });
@@ -441,9 +524,8 @@ const Engine = (() => {
       }
     }
     for (const o of fin) {
-      const known = KNOWN_SALE_VALUE[fp(o.key)];
-      // ventas sin traspaso: el "importe estimado" no es el real; se usa el primer valor liquidativo posterior
-      const target = o.sell ? (known ?? null) : (o.cur === "EUR" ? o.amount : null);
+      // ventas: el "importe estimado" no es el cobrado; se usa el primer valor liquidativo posterior a la orden
+      const target = o.sell ? null : (o.cur === "EUR" ? o.amount : null);
       let exec = o.fixedExec ?? null, bestErr = Infinity;
       for (let k = 0; k <= 10 && o.fixedExec == null; k++) {
         const v = nav.on(o.isin, o.day + k);
@@ -455,8 +537,7 @@ const Engine = (() => {
       o.execEst = exec == null;
       o.exec = exec ?? o.day + 2;
       o.price = nav.at(o.isin, o.exec).v;
-      o.flow = o.sell ? -o.units * o.price : (o.cur === "EUR" ? o.amount : o.units * o.price);
-      if (known != null) { o.flow = -known; o.price = known / o.units; }
+      o.flow = o.sell ? -o.units * o.price : (o.cur === "EUR" && o.amount != null ? o.amount : o.units * o.price);
     }
     return fin;
   }
@@ -567,39 +648,64 @@ const Engine = (() => {
     return { mdd, dd };
   }
 
+  // Cortes del "año de cuenta": empieza cada año el día/mes `start` ({d, m}); el corte es el día anterior.
+  const acctEnd = (y, start) => dayOf(y, start.m, start.d) - 1;
   // Cortes de periodo: devuelve [{label, a, b, partial}]
-  function periods(kind, from, to) {
+  function periods(kind, from, to, start = { d: 1, m: 1 }) {
     const out = [];
     const ends = [];
     const s = ymd(from), e = ymd(to);
-    if (kind === "account") for (let y = s.y - 1; y <= e.y + 1; y++) ends.push({ day: dayOf(y, 5, 31), label: y => `${y - 1}-${String(y).slice(2)}`, y });
-    if (kind === "year") for (let y = s.y - 1; y <= e.y + 1; y++) ends.push({ day: dayOf(y, 12, 31), label: y => `${y}`, y });
-    if (kind === "quarter") for (let y = s.y - 1; y <= e.y + 1; y++) for (let q = 1; q <= 4; q++) ends.push({ day: dayOf(y, q * 3 + 1, 1) - 1, label: () => `T${q} ${y}`, y });
-    if (kind === "month") for (let y = s.y - 1; y <= e.y + 1; y++) for (let m = 1; m <= 12; m++) ends.push({ day: dayOf(y, m + 1, 1) - 1, label: () => `${MONTHS[m - 1]} ${y}`, y });
+    const yy = y => String(y).slice(2);
+    if (kind === "account") for (let y = s.y - 1; y <= e.y + 1; y++) ends.push({ day: acctEnd(y, start), label: () => start.d === 1 && start.m === 1 ? `${y - 1}` : `${y - 1}-${yy(y)}` });
+    if (kind === "year") for (let y = s.y - 1; y <= e.y + 1; y++) ends.push({ day: dayOf(y, 12, 31), label: () => `${y}` });
+    if (kind === "quarter") for (let y = s.y - 1; y <= e.y + 1; y++) for (let q = 1; q <= 4; q++) ends.push({ day: dayOf(y, q * 3 + 1, 1) - 1, label: () => `T${q} ${y}` });
+    if (kind === "month") for (let y = s.y - 1; y <= e.y + 1; y++) for (let m = 1; m <= 12; m++) ends.push({ day: dayOf(y, m + 1, 1) - 1, label: () => `${MONTHS[m - 1]} ${y}` });
     ends.sort((p, q) => p.day - q.day);
     for (let i = 1; i < ends.length; i++) {
       const a0 = ends[i - 1].day, b0 = ends[i].day;
       if (b0 <= from || a0 >= to) continue;
       const a = Math.max(a0, from), b = Math.min(b0, to);
-      out.push({ label: ends[i].label(ends[i].y), a, b, partial: a !== a0 || b !== b0 });
+      out.push({ label: ends[i].label(), a, b, partial: a !== a0 || b !== b0 });
     }
     return out;
   }
   const MONTHS = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"];
 
+  // Tramos de valores liquidativos que faltan para valorar un CSV: ISIN -> [desde, hasta] (días),
+  // desde la primera orden hasta que el fondo se vende del todo (o hasta hoy si sigue en cartera).
+  function navNeeds(R, navData, today) {
+    const funds = navData.funds || {}, held = {}, need = {};
+    const span = {};
+    for (const o of [...R.fin].sort((x, y) => x.exec - y.exec)) {
+      const sp = span[o.isin] || (span[o.isin] = [o.day, o.exec]);
+      held[o.isin] = (held[o.isin] || 0) + (o.sell ? -o.units : o.units);
+      sp[1] = Math.max(sp[1], o.exec);
+    }
+    for (const [isin, [a, b0]] of Object.entries(span)) {
+      const b = held[isin] > 0.0015 ? today : b0;
+      const f = funds[isin], nav = f && f.nav && f.nav.length ? f.nav : null;
+      if (!nav || nav[0][0] > a + 3 || nav[nav.length - 1][0] < b - 5) need[isin] = [a - 10, b];
+    }
+    return need;
+  }
+
   function run(csvText, navData, overrides, today) {
     const { orders, bad } = parseCSV(csvText);
     const nav = buildNav(navData, orders);
-    const { fin, holdings, warnings } = classify(orders, overrides);
+    const { fin, holdings, warnings } = classify(orders, overrides, nav);
     if (!fin.length) throw new Error("El CSV no tiene órdenes finalizadas.");
     execute(fin, nav);
-    const blockOf = i => (navData.funds[i] && navData.funds[i].block) || "Otros";
+    const funds = navData.funds || {};
+    const blockOf = i => funds[i] ? blockFor(funds[i].category, funds[i].name) : "Otros";
     const tl = timeline(fin, nav, blockOf, today);
-    const unknown = tl.isins.filter(i => !navData.funds[i] && !i.startsWith("__transito:"));
-    return { orders, bad, fin, holdings, warnings, nav, tl, unknown };
+    // fondos sin histórico de precios para alguna de sus fechas: se valoran con los precios de las órdenes
+    const unknown = tl.isins.filter(i => !i.startsWith("__transito:") && fin.some(o => o.isin === i && nav.at(i, o.exec).est));
+    const names = {};
+    orders.forEach(o => { if (o.name && !names[o.isin]) names[o.isin] = o.name; });
+    return { orders, bad, fin, holdings, warnings, nav, tl, unknown, names };
   }
 
-  return { run, aggregate, period, periods, xirr, maxDrawdown, fmt, iso, fromIso, ts, ymd, dayOf, MONTHS, KNOWN_UNTIL };
+  return { run, parseCSV, navNeeds, blockFor, BLOCKS, aggregate, period, periods, xirr, maxDrawdown, fmt, iso, fromIso, ts, ymd, dayOf, MONTHS };
 })();
 if (typeof module !== "undefined") module.exports = Engine;
 
@@ -608,8 +714,8 @@ if (typeof module !== "undefined") module.exports = Engine;
 (() => {
 const $ = s => document.querySelector(s);
 const E = Engine;
-const BLOCKS = ["Desarrollados", "Emergentes", "Monetario", "Cartera automatizada", "Otros"];
-const BCOLOR = { "Desarrollados": "--s1", "Emergentes": "--s2", "Monetario": "--s3", "Cartera automatizada": "--s4", "Otros": "--s5" };
+const BLOCKS = E.BLOCKS;
+const BCOLOR = { "RV desarrollada": "--s1", "RV emergente": "--s2", "Renta fija": "--s5", "Monetario": "--s3", "Mixtos": "--s4", "Otros": "--s6" };
 const eur = new Intl.NumberFormat("es-ES", { style: "currency", currency: "EUR", minimumFractionDigits: 2, maximumFractionDigits: 2 });
 const eur0 = new Intl.NumberFormat("es-ES", { style: "currency", currency: "EUR", maximumFractionDigits: 0 });
 const nf = (d) => new Intl.NumberFormat("es-ES", { minimumFractionDigits: d, maximumFractionDigits: d });
@@ -624,8 +730,11 @@ const store = {
   del(k) { try { localStorage.removeItem(k); } catch {} },
 };
 
-let NAV = null, CSV = null, CSVNAME = "", CSVSOURCE = "embedded", OVERRIDES = {}, R = null, db = null, downloads = null;
-const ui = Object.assign({ preset: "all", from: null, to: null, blocks: null, group: "account", evo: "value", comp: "eur" }, store.get("panel-ui") || {});
+let NAV = null, CSV = null, CSVNAME = "", CSVSOURCE = "embedded", R = null, db = null, downloads = null;
+// Ajustes del usuario (correcciones compra/venta, inicio del año de cuenta) ligados a SU cuenta:
+// cada entrada guarda huellas de sus órdenes más antiguas y solo se aplica a un CSV que las contenga.
+let ACCOUNTS = [], SET = { ref: [], overrides: {}, acct: null };
+const ui = Object.assign({ preset: "all", from: null, to: null, blocks: null, group: "account", evo: "value", comp: "eur" }, store.get("panel-ui2") || {});
 const charts = {};
 
 function toast(msg) { const t = $("#toast"); t.textContent = msg; t.hidden = false; clearTimeout(toast.t); toast.t = setTimeout(() => t.hidden = true, 5200); }
@@ -635,21 +744,111 @@ const IN_CLAUDE = !!(window.claude && window.claude.use);
 // hoy en la fecha local del visor: el rango se puede extender hasta aquí
 const todayDay = () => { const t = new Date(); return E.dayOf(t.getFullYear(), t.getMonth() + 1, t.getDate()); };
 let EMBEDDED = null;
+const EMBEDDED_NAME = "CSV inicial";
+const hash = str => {
+  let h1 = 0xdeadbeef ^ 7, h2 = 0x41c6ce57 ^ 7;
+  for (let i = 0; i < str.length; i++) { const ch = str.charCodeAt(i); h1 = Math.imul(h1 ^ ch, 2654435761); h2 = Math.imul(h2 ^ ch, 1597334677); }
+  h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507); h1 ^= Math.imul(h2 ^ (h2 >>> 13), 3266489909);
+  h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507); h2 ^= Math.imul(h1 ^ (h1 >>> 13), 3266489909);
+  return (4294967296 * (2097151 & h2) + (h1 >>> 0)).toString(36);
+};
+const orderKey = o => `${o.isin}|${o.dateTxt}|${o.units}`;
+function csvRef(text) {
+  try { return E.parseCSV(text).orders.filter(o => o.done && o.units > 0).sort((a, b) => a.day - b.day).slice(0, 30).map(o => hash(orderKey(o))); }
+  catch { return []; }
+}
+// ajustes guardados que corresponden a este CSV (o unos vacíos si es otra cuenta)
+function settingsFor(text) {
+  const ref = csvRef(text);
+  const hit = ACCOUNTS.find(a => a.ref && a.ref.some(h => ref.includes(h)));
+  return hit ? { ...hit, ref } : { ref, overrides: {}, acct: null };
+}
+function loadAccounts(saved) {
+  if (!saved) return [];
+  if (Array.isArray(saved.cuentas)) return saved.cuentas;
+  if (saved.overrides && Object.keys(saved.overrides).length) {
+    // formato antiguo (sin cuenta): solo vale para el CSV que contiene esas órdenes
+    const keys = Object.keys(saved.overrides).map(hash);
+    return [{ ref: keys, overrides: saved.overrides, acct: null }];
+  }
+  return [];
+}
+async function saveSettings() {
+  ACCOUNTS = ACCOUNTS.filter(a => !(a.ref && a.ref.some(h => SET.ref.includes(h))));
+  if (Object.keys(SET.overrides).length || SET.acct) ACCOUNTS.push({ ref: SET.ref, overrides: SET.overrides, acct: SET.acct });
+  ACCOUNTS = ACCOUNTS.slice(-10);
+  store.set("panel-ajustes", { cuentas: ACCOUNTS });
+  if (db) { try { await db.doc("panel/ajustes").set({ cuentas: ACCOUNTS }); } catch {} }
+}
+function setCsv(text, name, source) {
+  CSV = text; CSVNAME = name; CSVSOURCE = source;
+  SET = text ? settingsFor(text) : { ref: [], overrides: {}, acct: null };
+}
+
+// ---------- valores liquidativos de fondos que no trae data/navs.json (Morningstar, desde el navegador) ----------
+const MS = "https://lt.morningstar.com/api/rest.svc/";
+let EXTRA = store.get("panel-navcache") || {};   // {ISIN: {name, category, nav, from, to}}: precios públicos, caché del navegador
+const NAVFAIL = {};                             // ISIN -> motivo, para no reintentar en esta visita
+let navBusy = false;
+const navData = () => {
+  const funds = { ...NAV.funds };
+  for (const [isin, f] of Object.entries(EXTRA)) {
+    const base = funds[isin];
+    if (!base) { funds[isin] = f; continue; }
+    const m = new Map(f.nav); base.nav.forEach(p => m.set(p[0], p[1]));
+    funds[isin] = { ...base, category: base.category || f.category, nav: [...m].sort((x, y) => x[0] - y[0]) };
+  }
+  return { funds };
+};
+async function getJSON(url) {
+  const ctl = new AbortController(), t = setTimeout(() => ctl.abort(), 20000);
+  try { const r = await fetch(url, { signal: ctl.signal }); if (!r.ok) throw new Error("HTTP " + r.status); return await r.json(); }
+  finally { clearTimeout(t); }
+}
+async function fetchFund(isin, from, to) {
+  const sc = await getJSON(`${MS}9vehuxllxs/security/screener?outputType=json&page=1&pageSize=10&securityDataPoints=SecId%7CName%7Cisin%7CCategoryName%7CPriceCurrency&term=${isin}&universeIds=FOESP%24%24ALL&languageId=es-ES`);
+  const rows = (sc.rows || []).filter(r => String(r.isin || "").toUpperCase() === isin);
+  if (!rows.length) throw new Error("no está en Morningstar");
+  const f = rows.find(r => r.PriceCurrency === "EUR") || rows[0];
+  const ts = await getJSON(`${MS}timeseries_price/9vehuxllxs?id=${encodeURIComponent(f.SecId)}%5D2%5D0%5DFOESP%24%24ALL&currencyId=EUR&idtype=Morningstar&frequency=daily&startDate=${E.iso(from)}&endDate=${E.iso(to)}&outputType=COMPACTJSON`);
+  const nav = (Array.isArray(ts) ? ts : []).filter(p => Array.isArray(p) && isFinite(p[1])).map(p => [Math.floor((p[0] - E.ts(0)) / 86400000), p[1]]);
+  if (!nav.length) throw new Error("sin precios");
+  const old = EXTRA[isin];
+  const m = new Map(old ? old.nav : []); nav.forEach(p => m.set(p[0], p[1]));
+  EXTRA[isin] = { name: f.Name, category: f.CategoryName || "", nav: [...m].sort((x, y) => x[0] - y[0]),
+    from: Math.min(from, old ? old.from : Infinity), to: Math.max(to, old ? old.to : -Infinity) };
+}
+async function ensureNavs() {
+  if (navBusy || !R) return;
+  const today = todayDay();
+  const need = Object.entries(E.navNeeds(R, navData(), today)).filter(([i]) => !(i in NAVFAIL))
+    // la caché ya cubre el tramo (o se pidió hoy y Morningstar aún no tiene más)
+    .filter(([i, [a, b]]) => !(EXTRA[i] && EXTRA[i].from <= a && (EXTRA[i].to >= b || EXTRA[i].to >= today)));
+  if (!need.length) return;
+  navBusy = true;
+  $("#nav-loading") || $("#notices").insertAdjacentHTML("afterbegin", `<div class="notice ok" id="nav-loading"><span>⏳</span><span>Descargando valores liquidativos de ${need.length} fondo(s) de tu CSV…</span></div>`);
+  await Promise.all(need.map(([isin, [a, b]]) => fetchFund(isin, a, Math.min(b, today)).catch(e => { NAVFAIL[isin] = e.message || "error"; })));
+  store.set("panel-navcache", EXTRA);
+  navBusy = false;
+  if (CSV) { compute(); render(); }
+}
+
 function show() {
   const has = !!CSV;
   $("#empty").hidden = has; $("#dash").hidden = !has;
   $("#btn-reset").hidden = !has || (CSVSOURCE === "embedded");
   $("#btn-reset").textContent = EMBEDDED ? "Volver al CSV original" : "Borrar mis datos de este navegador";
   if (!has) { $("#src").innerHTML = `<span class="chip">Valores liquidativos hasta ${E.fmt(Math.max(...Object.values(NAV.funds).map(f => f.nav.length ? f.nav[f.nav.length - 1][0] : 0)))}</span>`; return; }
-  compute(); render();
+  compute(); render(); ensureNavs();
 }
 async function boot() {
   const [n, c] = await Promise.all([fetch("data/navs.json").then(r => r.json()),
     fetch("data/ordenes.csv").then(r => r.ok ? r.text() : null).catch(() => null)]);
-  NAV = n; EMBEDDED = c; CSV = c; CSVNAME = c ? "Órdenes 153906.csv" : "";
+  NAV = n; EMBEDDED = c;
+  ACCOUNTS = loadAccounts(store.get("panel-ajustes") || { overrides: store.get("panel-overrides") || {} });
+  setCsv(c, c ? EMBEDDED_NAME : "", "embedded");
   const local = store.get("panel-csv");
-  if (local && local.csv) { CSV = local.csv; CSVNAME = local.name; CSVSOURCE = "local"; }
-  OVERRIDES = store.get("panel-overrides") || {};
+  if (local && local.csv) setCsv(local.csv, local.name, "local");
   if (!IN_CLAUDE) {
     document.querySelectorAll(".m-save").forEach(e => e.textContent = "solo en tu navegador");
     document.querySelectorAll(".m-nav").forEach(e => e.textContent = "Los valores liquidativos se actualizan solos cada día laborable.");
@@ -664,16 +863,27 @@ async function boot() {
       try {
         const [doc, adj] = await Promise.all([db.doc("panel/datos").get(), db.doc("panel/ajustes").get()]);
         let changed = false;
-        if (doc.exists && doc.data().csv) { CSV = doc.data().csv; CSVNAME = doc.data().name || "CSV subido"; CSVSOURCE = "db"; changed = true; }
-        if (adj.exists && adj.data().overrides) { OVERRIDES = { ...adj.data().overrides }; changed = true; }
+        if (adj.exists) { ACCOUNTS = loadAccounts(adj.data()); changed = true; }
+        if (doc.exists && doc.data().csv) { setCsv(doc.data().csv, doc.data().name || "CSV subido", "db"); changed = true; }
+        else if (changed && CSV) setCsv(CSV, CSVNAME, CSVSOURCE);
         if (changed) show();
       } catch (e) { /* sin guardado compartido: se usa este navegador */ }
     });
   }
 }
 
+// inicio del año de cuenta: el que elija el usuario o, por defecto, el día y mes de su primera orden
+function acctStart() {
+  const m = (SET.acct || "").match(/^(\d{1,2})\/(\d{1,2})$/);
+  if (m) return { d: +m[1], m: +m[2] };
+  const t = E.ymd(Math.min(...R.fin.map(o => o.day)));
+  return { d: t.d, m: t.m };
+}
+const acctBoundary = (y, st) => E.dayOf(y, st.m, st.d) - 1;
+const ddmm = st => `${String(st.d).padStart(2, "0")}/${String(st.m).padStart(2, "0")}`;
 function compute() {
-  R = E.run(CSV, NAV, OVERRIDES, todayDay());
+  R = E.run(CSV, navData(), SET.overrides, todayDay());
+  R.acct = acctStart();
   const present = BLOCKS.filter(b => R.tl.isins.some(i => R.tl.blockOf(i) === b));
   R.blocksPresent = present;
   if (!ui.blocks || !ui.blocks.some(b => present.includes(b))) ui.blocks = present.slice();
@@ -696,7 +906,7 @@ function aggFund(isin) {
 }
 function range() {
   const tl = R.tl, end = tl.end, start = tl.d0;
-  const lastAnniv = (() => { const y = E.ymd(end).y; const d = E.dayOf(y, 5, 31); return d <= end ? d : E.dayOf(y - 1, 5, 31); })();
+  const lastAnniv = (() => { const y = E.ymd(end).y; const d = acctBoundary(y, R.acct); return d <= end ? d : acctBoundary(y - 1, R.acct); })();
   let a = start, b = end;
   if (ui.preset === "acct") a = lastAnniv;
   else if (ui.preset === "ytd") a = E.dayOf(E.ymd(end).y, 1, 1) - 1;
@@ -706,11 +916,11 @@ function range() {
   a = Math.max(a, start); b = Math.min(Math.max(b, a + 1), end);
   return [a, b];
 }
-const fundName = i => (NAV.funds[i] && NAV.funds[i].name) || i;
+const fundName = i => (NAV.funds[i] && NAV.funds[i].name) || (EXTRA[i] && EXTRA[i].name) || (R && R.names[i]) || i;
 
 // ---------- render ----------
 function render() {
-  store.set("panel-ui", { preset: ui.preset, from: ui.from, to: ui.to, blocks: ui.blocks, group: ui.group, evo: ui.evo, comp: ui.comp });
+  store.set("panel-ui2", { preset: ui.preset, from: ui.from, to: ui.to, blocks: ui.blocks, group: ui.group, evo: ui.evo, comp: ui.comp });
   const [a, b] = range();
   const ag = agg(ui.blocks);
   renderHeader(); renderFilters(a, b); renderKpis(ag, a, b);
@@ -723,22 +933,26 @@ function renderHeader() {
   const lastOrder = Math.max(...R.orders.map(o => o.day));
   const src = { embedded: "CSV inicial", local: "Guardado en este navegador", db: "Guardado en el panel" }[CSVSOURCE];
   $("#src").innerHTML = [
-    `<span class="chip">${esc(CSVNAME)} · ${src}</span>`,
+    `<span class="chip">${CSVSOURCE === "embedded" ? src : esc(CSVNAME) + " · " + src}</span>`,
     `<span class="chip">${nFin} órdenes ejecutadas de ${nOrd}</span>`,
     `<span class="chip">Última orden ${E.fmt(lastOrder)}</span>`,
     `<span class="chip ${R.ordersAfterNav || R.navStale ? "est" : ""}">Valores liquidativos exactos hasta ${E.fmt(R.navUntil)}</span>`,
   ].join("");
   $("#subtitle").textContent = `Ganancias, aportaciones y evolución desde tu primera orden, el ${E.fmt(Math.min(...R.orders.map(o => o.day)))}.`;
   const notes = [];
-  const refresh = IN_CLAUDE ? "Para tener los exactos, pide a Claude «actualiza los valores liquidativos del panel»." : "Los exactos se añaden solos cada día laborable; vuelve a abrir el panel más adelante.";
-  if (R.ordersAfterNav || R.unknown.length)
-    notes.push(`<div class="notice"><span>⚠</span><span>Hay <b>valores estimados</b> después del ${E.fmt(R.navUntil)}${R.unknown.length ? ` y para ${R.unknown.length} fondo(s) sin histórico (${R.unknown.map(esc).join(", ")})` : ""}: se calculan con los precios de tus órdenes. ${refresh}</span></div>`);
+  const refresh = "Los exactos se añaden cuando Morningstar los publica (1-3 días hábiles); vuelve a abrir el panel más adelante.";
+  const failed = R.unknown.filter(i => i in NAVFAIL);
+  if (failed.length)
+    notes.push(`<div class="notice"><span>⚠</span><span>No se pudieron descargar los valores liquidativos de ${failed.length} fondo(s) (${failed.map(i => esc(fundName(i)) + (fundName(i) !== i ? " · " + esc(i) : "")).join(", ")}): se valoran con los precios de tus órdenes y las cifras de esos fondos son <b>aproximadas</b>.${IN_CLAUDE ? ` Ábrelo en <a href="https://oscaragcp.github.io/mi-cartera-myinvestor/" target="_blank" rel="noopener">la versión web</a>, que sí puede descargarlos.` : " Vuelve a intentarlo más tarde."}</span></div>`);
+  else if (R.ordersAfterNav || R.unknown.length)
+    notes.push(`<div class="notice"><span>⚠</span><span>Hay <b>valores estimados</b> después del ${E.fmt(R.navUntil)}${R.unknown.length ? ` o en fechas sin precio oficial de ${R.unknown.length} fondo(s)` : ""}: se calculan con los precios de tus órdenes. ${refresh}</span></div>`);
   else if (R.navStale)
     notes.push(`<div class="notice ok"><span>ℹ</span><span>Los últimos valores liquidativos son del ${E.fmt(R.navUntil)}. Hasta hoy se mantiene ese último valor (zona «estimado» de las gráficas). ${refresh}</span></div>`);
   R.warnings.forEach(w => notes.push(`<div class="notice"><span>⚠</span><span>${esc(w)}</span></div>`));
   if (R.bad.length) notes.push(`<div class="notice"><span>⚠</span><span>${R.bad.length} línea(s) del CSV sin fecha válida se han ignorado (líneas ${R.bad.slice(0, 8).join(", ")}${R.bad.length > 8 ? "…" : ""}).</span></div>`);
-  const auto = R.fin.filter(o => o.auto);
-  if (auto.length) notes.push(`<div class="notice ok"><span>ℹ</span><span>${auto.length} orden(es) nueva(s) se han tomado como venta porque vacían el fondo (${auto.map(o => esc(fundName(o.isin)) + " " + o.dateTxt).join("; ")}). Si no es así, cámbialo en la tabla de órdenes.</span></div>`);
+  const auto = R.fin.filter(o => o.auto && !o.manual), doubt = R.fin.filter(o => o.doubt && !o.manual);
+  if (auto.length) notes.push(`<div class="notice ok"><span>ℹ</span><span>El CSV no distingue compras de ventas: ${auto.length} orden(es) se han tomado como <b>venta</b> (vacían el fondo o su importe pasa a otro fondo). Revísalas en la tabla de órdenes con el filtro «Ventas» o «Traspasos» y corrígelas si hace falta.</span></div>`);
+  if (doubt.length) notes.push(`<div class="notice ok"><span>ℹ</span><span>${doubt.length} orden(es) con importe no redondo se han tomado como compra pero podrían ser reembolsos parciales a tu cuenta (${doubt.slice(0, 6).map(o => esc(fundName(o.isin)) + " " + o.dateTxt).join("; ")}${doubt.length > 6 ? "…" : ""}). Si alguna es una venta, cámbiala en la tabla de órdenes.</span></div>`);
   $("#notices").innerHTML = notes.join("");
 }
 
@@ -748,6 +962,10 @@ function renderFilters(a, b) {
   f.min = t.min = E.iso(R.tl.d0); f.max = t.max = E.iso(R.tl.end);
   f.value = E.iso(a); t.value = E.iso(b);
   $("#group").value = ui.group;
+  $("#opt-acct").textContent = `Año de cuenta (desde ${ddmm(R.acct)})`;
+  $("#acct-box").hidden = ui.group !== "account";
+  if (document.activeElement !== $("#acct")) $("#acct").value = SET.acct || "";
+  $("#acct").placeholder = ddmm(R.acct);
   const box = $("#blocks");
   box.querySelectorAll(".bchip").forEach(x => x.remove());
   R.blocksPresent.forEach(bl => {
@@ -817,8 +1035,9 @@ function estArea(a, b) {
 }
 function annivLines(a, b) {
   const out = [];
-  for (let y = 2022; y <= E.ymd(b).y; y++) { const d = E.dayOf(y, 5, 31); if (d > a && d < b) out.push({ xAxis: E.ts(d) }); }
-  return { silent: true, symbol: "none", lineStyle: { color: css("--axis"), type: "solid", width: 1 }, label: { show: true, formatter: p => "31/05/" + String(E.ymd(Math.round((p.value - E.ts(0)) / 86400000)).y).slice(2), color: css("--muted"), fontSize: 10, position: "insideEndTop" }, data: out };
+  if (ui.group !== "account") return null;
+  for (let y = E.ymd(a).y; y <= E.ymd(b).y + 1; y++) { const d = acctBoundary(y, R.acct); if (d > a && d < b) out.push({ xAxis: E.ts(d) }); }
+  return { silent: true, symbol: "none", lineStyle: { color: css("--axis"), type: "solid", width: 1 }, label: { show: true, formatter: p => { const t = E.ymd(Math.round((p.value - E.ts(0)) / 86400000)); return `${String(t.d).padStart(2, "0")}/${String(t.m).padStart(2, "0")}/${String(t.y).slice(2)}`; }, color: css("--muted"), fontSize: 10, position: "insideEndTop" }, data: out };
 }
 
 function renderEvo(ag, a, b) {
@@ -879,7 +1098,7 @@ function renderEvo(ag, a, b) {
 }
 
 function periodData(ag, a, b) {
-  return E.periods(ui.group, a, b).map(p => ({ ...p, ...E.period(R.tl, ag, p.a, p.b), label: p.label + (p.partial ? "*" : "") }));
+  return E.periods(ui.group, a, b, R.acct).map(p => ({ ...p, ...E.period(R.tl, ag, p.a, p.b), label: p.label + (p.partial ? "*" : "") }));
 }
 
 function renderGains(ag, a, b) {
@@ -931,7 +1150,7 @@ function renderFall(ag, a, b) {
 
 function renderFlows(a, b) {
   const B = base(), blocks = R.blocksPresent.filter(x => ui.blocks.includes(x));
-  const P = E.periods(ui.group, a, b);
+  const P = E.periods(ui.group, a, b, R.acct);
   const series = blocks.map(bl => {
     const ag = agg([bl]);
     return { name: bl, type: "bar", stack: "f", barMaxWidth: 40, itemStyle: { color: css(BCOLOR[bl]), borderColor: css("--surface"), borderWidth: 1 },
@@ -1038,7 +1257,7 @@ function renderFunds(a, b) {
 }
 
 function orderKind(o) {
-  if (o.state !== "Finalizada" || !o.units) return { k: "other", t: o.state || "—", cls: "off" };
+  if (!o.done || !o.units) return { k: "other", t: o.state || "—", cls: "off" };
   if (o.internal) return o.sell ? { k: "int", t: "Traspaso (salida)", cls: "int" } : { k: "int", t: "Traspaso (entrada)", cls: "int" };
   return o.sell ? { k: "sell", t: "Venta", cls: "sell" } : { k: "buy", t: "Compra", cls: "buy" };
 }
@@ -1053,7 +1272,7 @@ function renderOrders(a, b) {
   $("#orders-sub").textContent = `${list.length} órdenes en el rango. Las fechas de ejecución se deducen del valor liquidativo que cuadra con el importe.`;
   $("#tb-orders").innerHTML = `<thead><tr><th>Fecha</th><th class="l">Fondo</th><th class="l">Tipo</th><th>Participaciones</th><th>Importe</th><th>Precio</th><th>Ejecución</th><th class="l">Ajuste</th></tr></thead>
   <tbody>${list.map(o => { const k = orderKind(o); return `<tr><td class="num">${o.dateTxt}</td><td class="l">${esc(fundName(o.isin))}<span class="sub">${esc(o.isin)}</span></td>
-    <td class="l"><span class="tag ${k.cls}">${esc(k.t)}</span>${o.manual ? ` <span class="tag">manual</span>` : ""}${o.auto ? ` <span class="tag">deducida</span>` : ""}</td>
+    <td class="l"><span class="tag ${k.cls}">${esc(k.t)}</span>${o.manual ? ` <span class="tag">manual</span>` : ""}${o.auto && !o.manual ? ` <span class="tag" title="${o.why === "vacía" ? "Vacía el fondo" : "Su importe pasa a otro fondo"}">deducida</span>` : ""}${o.doubt && !o.manual ? ` <span class="tag" title="Importe no redondo: podría ser un reembolso parcial">¿venta?</span>` : ""}</td>
     <td class="num">${o.units ? nf(3).format(o.units) : "—"}</td>
     <td class="num">${o.flow != null ? eur.format(Math.abs(o.flow)) : (o.amount != null ? nf(2).format(o.amount) + " " + esc(o.cur) : "—")}</td>
     <td class="num">${o.price ? nf(3).format(o.price) : "—"}</td>
@@ -1087,9 +1306,12 @@ $("#dl-orders").onclick = () => {
 // ---------- subida de CSV ----------
 async function loadCsvText(text, name) {
   let test;
-  try { test = E.run(text, NAV, OVERRIDES, todayDay()); }
+  const set = settingsFor(text);
+  try { test = E.run(text, navData(), set.overrides, todayDay()); }
   catch (e) { toast("No se pudo leer el CSV: " + e.message); return; }
-  CSV = text; CSVNAME = name;
+  const other = !SET.ref.some(h => set.ref.includes(h));
+  setCsv(text, name, CSVSOURCE);
+  if (other) { ui.blocks = null; ui.preset = "all"; }
   let where = "en este navegador";
   if (db) {
     try { await db.doc("panel/datos").set({ csv: text, name, uploadedAt: new Date().toISOString(), orders: test.orders.length }); CSVSOURCE = "db"; where = "en el panel"; store.del("panel-csv"); }
@@ -1116,8 +1338,8 @@ $("#btn-reset").onclick = async () => {
   b.dataset.confirm = "";
   store.del("panel-csv");
   if (db) { try { await db.doc("panel/datos").delete(); } catch {} }
-  if (!EMBEDDED) { store.del("panel-overrides"); OVERRIDES = {}; }
-  CSV = EMBEDDED; CSVNAME = EMBEDDED ? "Órdenes 153906.csv" : ""; CSVSOURCE = "embedded";
+  if (!EMBEDDED) { store.del("panel-overrides"); store.del("panel-ajustes"); store.del("panel-navcache"); ACCOUNTS = []; EXTRA = {}; }
+  setCsv(EMBEDDED, EMBEDDED ? EMBEDDED_NAME : "", "embedded"); ui.blocks = null;
   show(); toast(EMBEDDED ? "Vuelves a ver el CSV original." : "Tus datos se han borrado de este navegador.");
 };
 let dragDepth = 0;
@@ -1131,16 +1353,21 @@ document.querySelectorAll("#presets button").forEach(bt => bt.onclick = () => { 
 $("#from").onchange = e => { if (!e.target.value) return; ui.preset = "custom"; ui.from = e.target.value; ui.to = $("#to").value; render(); };
 $("#to").onchange = e => { if (!e.target.value) return; ui.preset = "custom"; ui.to = e.target.value; ui.from = $("#from").value; render(); };
 $("#group").onchange = e => { ui.group = e.target.value; render(); };
+$("#acct").onchange = async e => {
+  const v = e.target.value.trim(), m = v.match(/^(\d{1,2})\/(\d{1,2})$/);
+  if (v && !(m && +m[2] >= 1 && +m[2] <= 12 && +m[1] >= 1 && +m[1] <= 31)) { toast("Escribe el día y el mes como dd/mm, por ejemplo 01/06."); e.target.value = SET.acct || ""; return; }
+  SET = { ...SET, acct: v ? `${m[1].padStart(2, "0")}/${m[2].padStart(2, "0")}` : null };
+  compute(); render(); await saveSettings();
+};
 document.querySelectorAll("#evo-mode button").forEach(bt => bt.onclick = () => { ui.evo = bt.dataset.m; render(); });
 document.querySelectorAll("#comp-mode button").forEach(bt => bt.onclick = () => { ui.comp = bt.dataset.m; render(); });
 $("#q").oninput = () => { const [a, b] = range(); renderOrders(a, b); };
 $("#otype").onchange = () => { const [a, b] = range(); renderOrders(a, b); };
 $("#tb-orders").addEventListener("click", async e => {
   const bt = e.target.closest("[data-flip]"); if (!bt) return;
-  OVERRIDES = { ...OVERRIDES, [bt.dataset.flip]: bt.dataset.sell !== "1" };
-  store.set("panel-overrides", OVERRIDES);
-  if (db) { try { await db.doc("panel/ajustes").set({ overrides: OVERRIDES }); } catch {} }
+  SET = { ...SET, overrides: { ...SET.overrides, [bt.dataset.flip]: bt.dataset.sell !== "1" } };
   compute(); render(); toast("Orden actualizada y recalculado.");
+  await saveSettings();
 });
 // tema: repintar gráficas cuando cambia
 const rerender = () => R && render();

@@ -2,134 +2,153 @@
  "IE00BYX5NX33": {
   "secid": "F00001019E",
   "name": "Fidelity MSCI World",
-  "block": "Desarrollados",
+  "block": "RV desarrollada",
   "from": "2021-05-01",
-  "to": null
+  "to": null,
+  "category": "RV Global Cap. Grande Blend"
  },
  "LU0996175948": {
   "secid": "F00000SCLB",
   "name": "Amundi MSCI Emerging Markets",
-  "block": "Emergentes",
+  "block": "RV emergente",
   "from": "2021-05-01",
-  "to": null
+  "to": null,
+  "category": "RV Global Emergente"
  },
  "IE000ZYRH0Q7": {
   "secid": "F00001SELX",
   "name": "iShares Developed World",
-  "block": "Desarrollados",
+  "block": "RV desarrollada",
   "from": "2025-08-01",
-  "to": null
+  "to": null,
+  "category": "RV Global Cap. Grande Blend"
  },
  "IE000QAZP7L2": {
   "secid": "F00001SELW",
   "name": "iShares Emerging Markets",
-  "block": "Emergentes",
+  "block": "RV emergente",
   "from": "2025-08-01",
-  "to": null
+  "to": null,
+  "category": "RV Global Emergente"
  },
  "LU0080237943": {
   "secid": "F0GBR04AW6",
   "name": "DWS Euro Ultra Short (monetario)",
   "block": "Monetario",
   "from": "2024-12-01",
-  "to": "2025-05-01"
+  "to": null,
+  "category": "RF Ultra Corto Plazo EUR"
  },
  "IE00BYX5MX67": {
   "secid": "F00001019G",
   "name": "Fidelity S&P 500",
-  "block": "Cartera automatizada",
+  "block": "RV desarrollada",
   "from": "2021-05-25",
-  "to": "2022-02-15"
+  "to": null,
+  "category": "RV USA Cap. Grande Blend"
  },
  "IE00BYWYCC39": {
   "secid": "F00000YZAJ",
   "name": "iShares Emerging Markets (D)",
-  "block": "Cartera automatizada",
+  "block": "RV emergente",
   "from": "2021-05-25",
-  "to": "2022-02-15"
+  "to": null,
+  "category": "RV Global Emergente"
  },
  "IE0007471471": {
   "secid": "F0GBR052E1",
   "name": "Vanguard U.S. Govt Bond",
-  "block": "Cartera automatizada",
+  "block": "Renta fija",
   "from": "2021-05-25",
-  "to": "2022-02-15"
+  "to": null,
+  "category": "RF Otros"
  },
  "IE00B246KL88": {
   "secid": "F000001GFI",
   "name": "Vanguard 20+ Yr Euro Treasury",
-  "block": "Cartera automatizada",
+  "block": "Renta fija",
   "from": "2021-05-25",
-  "to": "2022-02-15"
+  "to": null,
+  "category": "RF Largo Plazo EUR"
  },
  "IE00BYX5MD61": {
   "secid": "F00000ZZMQ",
   "name": "Fidelity MSCI Europe",
-  "block": "Cartera automatizada",
+  "block": "RV desarrollada",
   "from": "2021-05-25",
-  "to": "2022-02-15"
+  "to": null,
+  "category": "RV Europa Cap. Grande Blend"
  },
  "IE00BYX5N771": {
   "secid": "F00001019C",
   "name": "Fidelity MSCI Japan",
-  "block": "Cartera automatizada",
+  "block": "RV desarrollada",
   "from": "2021-05-25",
-  "to": "2022-02-15"
+  "to": null,
+  "category": "RV Japón Cap. Grande Blend"
  },
  "IE00B1G3DH73": {
   "secid": "F0000000VM",
   "name": "Vanguard U.S. 500 (cubierto)",
-  "block": "Cartera automatizada",
+  "block": "RV desarrollada",
   "from": "2021-05-25",
-  "to": "2022-02-15"
+  "to": null,
+  "category": "RV Otros"
  },
  "IE00BDZVHT63": {
   "secid": "F0000103YN",
   "name": "Fidelity MSCI Pacific ex Japan",
-  "block": "Cartera automatizada",
+  "block": "RV desarrollada",
   "from": "2021-05-25",
-  "to": "2022-02-15"
+  "to": null,
+  "category": "RV Pacífico (ex-Japón)"
  },
  "LU2349459045": {
   "secid": "F00001D3FZ",
   "name": "GS Global Enhanced Index Sust. Equity",
-  "block": "Cartera automatizada",
+  "block": "RV desarrollada",
   "from": "2021-05-25",
-  "to": "2022-02-15"
+  "to": null,
+  "category": "RV Global Cap. Grande Blend"
  },
  "IE00B5456744": {
   "secid": "F00000LY5Q",
   "name": "Vanguard ESG Developed World",
-  "block": "Cartera automatizada",
+  "block": "RV desarrollada",
   "from": "2021-05-25",
-  "to": "2022-02-15"
+  "to": null,
+  "category": "RV Global Cap. Grande Blend"
  },
  "IE00BDZS0987": {
   "secid": "F00000ZL0B",
   "name": "iShares US Index",
-  "block": "Cartera automatizada",
+  "block": "RV desarrollada",
   "from": "2021-05-25",
-  "to": "2022-02-15"
+  "to": null,
+  "category": "RV USA Cap. Grande Blend"
  },
  "IE0007987708": {
   "secid": "F0GBR04SGM",
   "name": "Vanguard European Stock",
-  "block": "Cartera automatizada",
+  "block": "RV desarrollada",
   "from": "2021-05-25",
-  "to": "2022-02-15"
+  "to": null,
+  "category": "RV Europa Cap. Grande Blend"
  },
  "IE00BDRK7T12": {
   "secid": "F00000Z2S3",
   "name": "iShares Japan Index",
-  "block": "Cartera automatizada",
+  "block": "RV desarrollada",
   "from": "2021-05-25",
-  "to": "2022-02-15"
+  "to": null,
+  "category": "RV Japón Cap. Grande Blend"
  },
  "IE00BDRK7R97": {
   "secid": "F00000Z2S4",
   "name": "iShares Pacific Index",
-  "block": "Cartera automatizada",
+  "block": "RV desarrollada",
   "from": "2021-05-25",
-  "to": "2022-02-15"
+  "to": null,
+  "category": "RV Pacífico (ex-Japón)"
  }
 }
